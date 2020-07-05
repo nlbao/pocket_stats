@@ -1,11 +1,17 @@
+import nltk
+import os
 import json
 import logging
 from pocket import Pocket
 from typing import List, Dict
+from collections import Counter
+from nltk.corpus import stopwords
 from constants import CACHE_FILE, CONSUMER_KEY, ACCESS_TOKEN
 
 
 api = Pocket(consumer_key=CONSUMER_KEY, access_token=ACCESS_TOKEN)
+nltk.download('stopwords')
+invalid_words = stopwords.words('english')
 
 
 def fetch_data(offset: int = 0, limit: int = None, overwrite_cache: bool = False) -> List[Dict]:
@@ -17,8 +23,32 @@ def fetch_data(offset: int = 0, limit: int = None, overwrite_cache: bool = False
         ans.extend(item for k, item in items.items())
         if (limit is not None) or (len(items) == 0):
             break
+    logging.info(f'Fetched {len(ans)} records')
     if overwrite_cache:
         logging.info(f'Writing data to cache file {CACHE_FILE}')
         with open(CACHE_FILE, 'w') as fo:
             json.dump(ans, fo)
     return ans
+
+
+def load_cache() -> List[Dict]:
+    if not os.path.isfile(CACHE_FILE):
+        return []
+    with open(CACHE_FILE, 'r') as fi:
+        return json.load(fi)
+
+
+def is_valid_word(w):
+    if len(w) == 0:
+        return False
+    if w in invalid_words:
+        return False
+    return True
+
+
+def word_count(data: List[Dict]) -> Dict[str, int]:
+    words = []
+    for record in data:
+        title = record['given_title']
+        words.extend(x.strip().lower() for x in title.split(' ') if is_valid_word(x.strip().lower()))
+    return Counter(words)

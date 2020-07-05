@@ -3,8 +3,8 @@ import logging
 import os
 
 
-CONSUMER_KEY = os.environ['CONSUMER_KEY']
-ACCESS_TOKEN = os.environ['ACCESS_TOKEN']
+CONSUMER_KEY = os.environ['POCKET_TOOLS_CONSUMER_KEY']
+ACCESS_TOKEN = os.environ['POCKET_TOOLS_ACCESS_TOKEN']
 CACHE_FILE = os.environ.get('POCKET_TOOLS_CACHE_FILE', os.path.expanduser('~/pocket-tools.cache'))
 
 root = logging.getLogger()
