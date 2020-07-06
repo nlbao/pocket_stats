@@ -12,7 +12,10 @@ from constants import CACHE_FILE, CONSUMER_KEY, ACCESS_TOKEN, DEFAULT_READING_SP
 
 
 api = Pocket(consumer_key=CONSUMER_KEY, access_token=ACCESS_TOKEN)
-nltk.download('stopwords')
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('stopwords')
 invalid_words = stopwords.words('english')
 
 
