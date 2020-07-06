@@ -26,7 +26,10 @@ def fetch_data(offset: int = 0, limit: int = None, overwrite_cache: bool = False
         limit += offset
         count = min(count, limit)
     while (limit is None) or (offset < limit):
-        response = api.retrieve(offset=offset, count=count)
+        response = api.retrieve(
+            offset=offset, count=count,
+            state='all',  # both unread and archived items
+        )
         items = response.get('list', {})
         n = len(items)
         if n == 0:
