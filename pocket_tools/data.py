@@ -6,7 +6,7 @@ from pocket import Pocket
 from typing import List, Dict
 from collections import Counter
 from nltk.corpus import stopwords
-from constants import CACHE_FILE, CONSUMER_KEY, ACCESS_TOKEN
+from constants import CACHE_FILE, CONSUMER_KEY, ACCESS_TOKEN, DEFAULT_READING_SPEED
 
 
 api = Pocket(consumer_key=CONSUMER_KEY, access_token=ACCESS_TOKEN)
@@ -46,9 +46,19 @@ def is_valid_word(w):
     return True
 
 
-def word_count(data: List[Dict]) -> Dict[str, int]:
+def count_words_in_title(data: List[Dict]) -> Dict[str, int]:
     words = []
     for record in data:
         title = record['given_title']
         words.extend(x.strip().lower() for x in title.split(' ') if is_valid_word(x.strip().lower()))
     return Counter(words)
+
+
+def get_word_counts(data: List[Dict]) -> List[int]:
+    return [int(record.get('word_count', -99999)) for record in data]
+
+
+def get_reading_time(data: List[Dict], reading_speed: int = DEFAULT_READING_SPEED) -> List[int]:
+    # because some records in data don't have the 'time_to_read' field
+    word_counts = get_word_counts(data)
+    return [wc / DEFAULT_READING_SPEED for wc in word_counts if wc > 0]

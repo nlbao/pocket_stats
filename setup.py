@@ -5,6 +5,7 @@
 from os import path
 from setuptools import setup
 
+
 # read the contents of your README file
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
@@ -24,7 +25,13 @@ setup(
     install_requires=[
         'setuptools',
         'click',
-        'pocket-api'
+        'pocket-api',
+        'dash',
+        'dash-renderer',
+        'dash-html-components',
+        'dash-core-components',
+        'plotly',
+        'nltk',
     ],
     tests_require=['pytest'],
     zip_safe=False
