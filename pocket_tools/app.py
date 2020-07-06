@@ -34,11 +34,14 @@ def word_cloud_plot(data: List[Dict]) -> html.Div:
     ])
 
 
-def articles_over_time_plot(data: List[Dict]) -> html.Div:
+def articles_over_time_plot(data: List[Dict], should_cumsum: bool = True) -> html.Div:
     df = get_added_time_series(data)
     archived_df = get_archived_time_series(data)
     if len(archived_df) > 0:
         df = pd.merge(df, archived_df, how='outer', left_index=True, right_index=True)
+    if should_cumsum:
+        df.fillna(0, inplace=True)
+        df = df.cumsum()
     fig = px.line(df, labels={'index': 'Date', 'value': 'Number of articles'})
     return dcc.Graph(id='time_series', figure=fig)
 
