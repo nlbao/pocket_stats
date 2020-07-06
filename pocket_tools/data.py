@@ -18,14 +18,19 @@ invalid_words = stopwords.words('english')
 
 def fetch_data(offset: int = 0, limit: int = None, overwrite_cache: bool = False) -> List[Dict]:
     ans = []
-    count = limit if (limit is not None) else 100
-    while True:
+    count = 500
+    if limit is not None:
+        limit += offset
+        count = min(count, limit)
+    while (limit is None) or (offset < limit):
         response = api.retrieve(offset=offset, count=count)
-        items = response.get('list', [])
-        ans.extend(item for k, item in items.items())
-        if (limit is not None) or (len(items) == 0):
+        items = response.get('list', {})
+        n = len(items)
+        if n == 0:
             break
-    logging.info(f'Fetched {len(ans)} records')
+        ans.extend(item for k, item in items.items())
+        logging.info(f'Fetched {n} records. Total = {len(ans)} now.')
+        offset += n
     if overwrite_cache:
         logging.info(f'Writing data to cache file {CACHE_FILE}')
         with open(CACHE_FILE, 'w') as fo:

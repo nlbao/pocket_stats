@@ -8,8 +8,8 @@ def cli():
 
 
 @click.command()
-@click.option('--offset', default=0)
-@click.option('--limit', default=None)
+@click.option('--offset', type=int, default=0)
+@click.option('--limit', type=int, default=None)
 @click.option('--overwrite_cache', is_flag=True)
 def fetch_data(offset: int, limit: int, overwrite_cache: bool) -> None:
     ans = _fetch_data(offset, limit, overwrite_cache)
