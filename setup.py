@@ -32,6 +32,7 @@ setup(
         'dash-core-components',
         'plotly',
         'nltk',
+        'tldextract',
     ],
     tests_require=['pytest'],
     zip_safe=False

@@ -2,6 +2,7 @@ import nltk
 import os
 import json
 import logging
+import tldextract
 from datetime import datetime
 from pocket import Pocket
 from typing import List, Dict
@@ -92,3 +93,12 @@ def get_archived_time_series(data: List[Dict]) -> pd.DataFrame:
     df = pd.DataFrame.from_dict({datetime.strptime(d, '%Y%m%d'): cnt for d, cnt in added_date_counts.items()},
                                 orient='index', columns=['archived_articles_count'])
     return df
+
+
+def get_domain_from_url(url: str) -> str:
+    extract_result = tldextract.extract(url)
+    return extract_result.domain + '.' + extract_result.suffix
+
+
+def get_domain_counts(data: List[Dict]) -> Dict[str, int]:
+    return Counter(get_domain_from_url(record['resolved_url']) for record in data)

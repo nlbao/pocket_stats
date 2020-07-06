@@ -9,7 +9,7 @@ import plotly.graph_objs as go
 import plotly.express as px
 
 from data import load_cache, count_words_in_title, get_word_counts, get_reading_time
-from data import get_added_time_series, get_archived_time_series
+from data import get_added_time_series, get_archived_time_series, get_domain_counts
 from constants import DEFAULT_READING_SPEED
 
 
@@ -61,6 +61,17 @@ def reading_time_plot(data: List[Dict]) -> html.Div:
     return dcc.Graph(id='reading-time', figure=fig)
 
 
+def domain_counts_plot(data: List[Dict], limit: int = 20) -> dcc.Graph:
+    pairs = list(get_domain_counts(data).items())
+    pairs.sort(key=lambda p: -p[1])  # sort desc by count
+    pairs = pairs[:limit]  # display top items only
+    pairs.reverse()  # because px.bar display the items in a reversed order
+    fig = px.bar(x=[p[1] for p in pairs],
+                 y=[p[0] for p in pairs],
+                 orientation='h', labels={'x': 'Number of articles', 'y': 'Domain'})
+    return dcc.Graph(id='domain-counts', figure=fig)
+
+
 if __name__ == '__main__':
     data = load_cache()
     app = dash.Dash()
@@ -69,5 +80,6 @@ if __name__ == '__main__':
         articles_over_time_plot(data),
         word_counts_plot(data),
         reading_time_plot(data),
+        domain_counts_plot(data),
     ])
     app.run_server(debug=True)  # TODO: add command line option --debug
