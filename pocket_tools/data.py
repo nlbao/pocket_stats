@@ -2,10 +2,12 @@ import nltk
 import os
 import json
 import logging
+from datetime import datetime
 from pocket import Pocket
 from typing import List, Dict
 from collections import Counter
 from nltk.corpus import stopwords
+import pandas as pd
 from constants import CACHE_FILE, CONSUMER_KEY, ACCESS_TOKEN, DEFAULT_READING_SPEED
 
 
@@ -62,3 +64,20 @@ def get_reading_time(data: List[Dict], reading_speed: int = DEFAULT_READING_SPEE
     # because some records in data don't have the 'time_to_read' field
     word_counts = get_word_counts(data)
     return [wc / DEFAULT_READING_SPEED for wc in word_counts if wc > 0]
+
+
+def get_added_time_series(data: List[Dict]) -> pd.DataFrame:
+    added_date_counts = Counter(datetime.fromtimestamp(int(record['time_added'])).strftime('%Y%m%d') for record in data)
+    df = pd.DataFrame.from_dict({datetime.strptime(d, '%Y%m%d'): cnt for d, cnt in added_date_counts.items()},
+                                orient='index', columns=['added_articles_count'])
+    return df
+
+
+def get_archived_time_series(data: List[Dict]) -> pd.DataFrame:
+    added_date_counts = Counter(
+        datetime.fromtimestamp(int(record['time_updated'])).strftime('%Y%m%d')
+        for record in data if int(record['status']) == 1
+    )
+    df = pd.DataFrame.from_dict({datetime.strptime(d, '%Y%m%d'): cnt for d, cnt in added_date_counts.items()},
+                                orient='index', columns=['archived_articles_count'])
+    return df
