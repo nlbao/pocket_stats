@@ -113,3 +113,12 @@ def normalize_language_name(lang: str) -> str:
 
 def get_language_counts(data: List[Dict]) -> Dict[str, int]:
     return Counter(normalize_language_name(record['lang']) for record in data)
+
+
+def get_favorite_count(data: List[Dict]) -> Dict[str, int]:
+    total = len(data)
+    cnt = sum(1 for record in data if int(record['favorite']) == 1)
+    return {
+        'count': cnt,
+        'percent': 1.0 * cnt / total if total > 0 else 0,
+    }

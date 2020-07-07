@@ -8,8 +8,8 @@ import dash_html_components as html
 import plotly.graph_objs as go
 import plotly.express as px
 
-from data import load_cache, count_words_in_title, get_word_counts, get_reading_time
-from data import get_added_time_series, get_archived_time_series, get_domain_counts, get_language_counts
+from data import load_cache, count_words_in_title, get_word_counts, get_reading_time, get_domain_counts
+from data import get_added_time_series, get_archived_time_series, get_language_counts, get_favorite_count
 from constants import DEFAULT_READING_SPEED
 
 
@@ -86,6 +86,20 @@ def language_counts_plot(data: List[Dict]) -> dcc.Graph:
     return dcc.Graph(id='language-counts', figure=fig)
 
 
+def favorite_count_plot(data: List[Dict]) -> html.Div:
+    res = get_favorite_count(data)
+    return html.Div([
+        html.H1(children='Favorite', style={'textAlign': 'center'}),
+        html.H1(
+            children=f"{res['count']} articles ({'%.2f' % res['percent']} %)",
+            style={
+                'textAlign': 'center',
+                'color': 'orange',
+            }
+        ),
+    ])
+
+
 if __name__ == '__main__':
     data = load_cache()
     app = dash.Dash()
@@ -96,5 +110,6 @@ if __name__ == '__main__':
         reading_time_plot(data),
         domain_counts_plot(data),
         language_counts_plot(data),
+        favorite_count_plot(data),
     ])
     app.run_server(debug=True)  # TODO: add command line option --debug
