@@ -9,7 +9,7 @@ import plotly.graph_objs as go
 import plotly.express as px
 
 from data import load_cache, count_words_in_title, get_word_counts, get_reading_time
-from data import get_added_time_series, get_archived_time_series, get_domain_counts
+from data import get_added_time_series, get_archived_time_series, get_domain_counts, get_language_counts
 from constants import DEFAULT_READING_SPEED
 
 
@@ -72,6 +72,20 @@ def domain_counts_plot(data: List[Dict], limit: int = 20) -> dcc.Graph:
     return dcc.Graph(id='domain-counts', figure=fig)
 
 
+def language_counts_plot(data: List[Dict]) -> dcc.Graph:
+    pairs = list(get_language_counts(data).items())
+    fig = go.Figure(
+        data=[
+            go.Pie(
+                labels=[p[0] for p in pairs],
+                values=[p[1] for p in pairs],
+            ),
+        ],
+        layout_title_text="Languages",
+    )
+    return dcc.Graph(id='language-counts', figure=fig)
+
+
 if __name__ == '__main__':
     data = load_cache()
     app = dash.Dash()
@@ -81,5 +95,6 @@ if __name__ == '__main__':
         word_counts_plot(data),
         reading_time_plot(data),
         domain_counts_plot(data),
+        language_counts_plot(data),
     ])
     app.run_server(debug=True)  # TODO: add command line option --debug

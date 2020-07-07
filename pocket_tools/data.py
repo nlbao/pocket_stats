@@ -102,3 +102,14 @@ def get_domain_from_url(url: str) -> str:
 
 def get_domain_counts(data: List[Dict]) -> Dict[str, int]:
     return Counter(get_domain_from_url(record['resolved_url']) for record in data)
+
+
+def normalize_language_name(lang: str) -> str:
+    lang = lang.strip()
+    if len(lang) == 0:
+        return 'unknown'
+    return lang
+
+
+def get_language_counts(data: List[Dict]) -> Dict[str, int]:
+    return Counter(normalize_language_name(record['lang']) for record in data)
