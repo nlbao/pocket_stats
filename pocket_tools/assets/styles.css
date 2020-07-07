@@ -1,0 +1,15 @@
+.two-columns--0 {
+  width: 50%;
+  max-width: 50%;
+  float: left;
+}
+
+.two-columns--1 {
+  width: 50%;
+  max-width: 50%;
+  display: inline-block;
+}
+
+.favorite-div {
+  padding-top: 50px;
+}

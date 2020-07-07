@@ -106,7 +106,7 @@ def get_reading_time(data: List[Dict],
 def get_added_time_series(data: List[Dict]) -> pd.DataFrame:
     added_date_counts = Counter(datetime.fromtimestamp(int(record['time_added'])).strftime('%Y%m%d') for record in data)
     df = pd.DataFrame.from_dict({datetime.strptime(d, '%Y%m%d'): cnt for d, cnt in added_date_counts.items()},
-                                orient='index', columns=['added_articles_count'])
+                                orient='index', columns=['All articles'])
     return df
 
 
@@ -116,7 +116,7 @@ def get_archived_time_series(data: List[Dict]) -> pd.DataFrame:
         for record in data if int(record['status']) == 1
     )
     df = pd.DataFrame.from_dict({datetime.strptime(d, '%Y%m%d'): cnt for d, cnt in added_date_counts.items()},
-                                orient='index', columns=['archived_articles_count'])
+                                orient='index', columns=['Archived articles'])
     return df
 
 

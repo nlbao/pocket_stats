@@ -1,7 +1,7 @@
 import random
 import plotly
 import pandas as pd
-from typing import List, Dict
+from typing import List, Dict, Any
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -11,6 +11,13 @@ import plotly.express as px
 from data import load_cache, count_words_in_title, get_word_counts, get_reading_time, get_domain_counts
 from data import get_added_time_series, get_archived_time_series, get_language_counts, get_favorite_count
 from constants import DEFAULT_READING_SPEED
+
+
+def plot_two_columns(col0: Any, col1: Any) -> html.Div:
+    return html.Div(className='row', children=[
+        html.Div([col0], className='two-columns--0'),
+        html.Div([col1], className='two-columns--1'),
+    ])
 
 
 def word_cloud_plot(data: List[Dict]) -> html.Div:
@@ -34,7 +41,7 @@ def word_cloud_plot(data: List[Dict]) -> html.Div:
     ])
 
 
-def articles_over_time_plot(data: List[Dict], should_cumsum: bool = True) -> html.Div:
+def articles_over_time_plot(data: List[Dict], should_cumsum: bool = True) -> dcc.Graph:
     df = get_added_time_series(data)
     archived_df = get_archived_time_series(data)
     if len(archived_df) > 0:
@@ -42,7 +49,9 @@ def articles_over_time_plot(data: List[Dict], should_cumsum: bool = True) -> htm
     if should_cumsum:
         df.fillna(0, inplace=True)
         df = df.cumsum()
-    fig = px.line(df, labels={'index': 'Date', 'value': 'Number of articles'})
+    fig = px.line(df,
+                  labels={'index': 'Date', 'value': 'Number of articles'},
+                  title='Article Count Over Time')
     return dcc.Graph(id='time_series', figure=fig)
 
 
@@ -105,7 +114,11 @@ def domain_counts_plot(data: List[Dict], limit: int = 20) -> dcc.Graph:
         name='Archived articles',
         orientation='h',
     ))
-    fig.update_layout(barmode='stack')
+    fig.update_layout(
+        title_text='Top Domains',
+        barmode='stack',
+        yaxis=dict(tickmode='linear'),  # to show ALL labels
+    )
     return dcc.Graph(id='domain-counts', figure=fig)
 
 
@@ -125,28 +138,30 @@ def language_counts_plot(data: List[Dict]) -> dcc.Graph:
 
 def favorite_count_plot(data: List[Dict]) -> html.Div:
     res = get_favorite_count(data)
-    return html.Div([
-        html.H1(children='Favorite', style={'textAlign': 'center'}),
-        html.H1(
-            children=f"{res['count']} articles ({'%.2f' % res['percent']} %)",
-            style={
-                'textAlign': 'center',
-                'color': 'orange',
-            }
-        ),
-    ])
+    return html.Div(
+        [
+            html.H2(children='Favorite', style={'textAlign': 'center'}),
+            html.H2(
+                children=f"{res['count']} articles ({'%.2f' % (100.0 * res['percent'])} %)",
+                style={
+                    'textAlign': 'center',
+                    'color': 'orange',
+                }
+            )
+        ],
+        className='favorite-div',
+    )
 
 
 if __name__ == '__main__':
     data = load_cache()
     app = dash.Dash()
+    app.title = "Pocket Analyzer"
     app.layout = html.Div(style={}, children=[
         word_cloud_plot(data),
         articles_over_time_plot(data),
-        word_counts_plot(data),
-        reading_time_plot(data),
+        plot_two_columns(word_counts_plot(data), reading_time_plot(data)),
         domain_counts_plot(data),
-        language_counts_plot(data),
-        favorite_count_plot(data),
+        plot_two_columns(language_counts_plot(data), favorite_count_plot(data)),
     ])
     app.run_server(debug=True)  # TODO: add command line option --debug
