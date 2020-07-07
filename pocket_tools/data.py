@@ -60,6 +60,27 @@ def is_valid_word(w):
     return True
 
 
+# filter format: [key, operation, expected_value]
+def should_pass_filter(filter: List, record: Dict):
+    key, op, expected = filter
+    expected = str(expected) if expected is not None else None
+    value = record.get(key, None)
+    value = str(value) if value is not None else None
+    if op == '=':
+        return value == expected
+    elif op == '!=':
+        return value != expected
+    else:
+        raise NotImplementedError
+
+
+def should_pass_filters(filters: List[List], record: Dict) -> bool:
+    for f in filters:
+        if not should_pass_filter(f, record):
+            return False
+    return True
+
+
 def count_words_in_title(data: List[Dict]) -> Dict[str, int]:
     words = []
     for record in data:
@@ -68,14 +89,18 @@ def count_words_in_title(data: List[Dict]) -> Dict[str, int]:
     return Counter(words)
 
 
-def get_word_counts(data: List[Dict]) -> List[int]:
-    return [int(record.get('word_count', -99999)) for record in data]
+def get_word_counts(data: List[Dict], filters: List[List] = []) -> List[int]:
+    return [int(record.get('word_count', -99999))
+            for record in data
+            if should_pass_filters(filters, record)]
 
 
-def get_reading_time(data: List[Dict], reading_speed: int = DEFAULT_READING_SPEED) -> List[int]:
+def get_reading_time(data: List[Dict],
+                     reading_speed: int = DEFAULT_READING_SPEED,
+                     filters: List[List] = []) -> List[float]:
     # because some records in data don't have the 'time_to_read' field
-    word_counts = get_word_counts(data)
-    return [wc / DEFAULT_READING_SPEED for wc in word_counts if wc > 0]
+    word_counts = get_word_counts(data, filters=filters)
+    return [wc / reading_speed for wc in word_counts if wc > 0]
 
 
 def get_added_time_series(data: List[Dict]) -> pd.DataFrame:
@@ -100,8 +125,10 @@ def get_domain_from_url(url: str) -> str:
     return extract_result.domain + '.' + extract_result.suffix
 
 
-def get_domain_counts(data: List[Dict]) -> Dict[str, int]:
-    return Counter(get_domain_from_url(record['resolved_url']) for record in data)
+def get_domain_counts(data: List[Dict], filters: List[List] = []) -> Dict[str, int]:
+    return Counter(get_domain_from_url(record['resolved_url'])
+                   for record in data
+                   if should_pass_filters(filters, record))
 
 
 def normalize_language_name(lang: str) -> str:

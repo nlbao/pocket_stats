@@ -46,29 +46,66 @@ def articles_over_time_plot(data: List[Dict], should_cumsum: bool = True) -> htm
     return dcc.Graph(id='time_series', figure=fig)
 
 
-def word_counts_plot(data: List[Dict]) -> html.Div:
-    word_cnts = get_word_counts(data)
-    fig = px.histogram(x=word_cnts, labels={'x': 'Number of words'})
-    return dcc.Graph(id='word-counts', figure=fig)
+def word_counts_plot(data: List[Dict]) -> dcc.Graph:
+    fig = go.Figure()
+    fig.add_trace(go.Histogram(
+        x=get_word_counts(data, filters=[['status', '=', 0]]),  # unread
+        name='Unread articles',
+    ))
+    fig.add_trace(go.Histogram(
+        x=get_word_counts(data, filters=[['status', '=', 1]]),  # archived
+        name='Archived articles',
+    ))
+    fig.update_layout(
+        title_text='Word Count',  # title of plot
+        xaxis_title_text='Number of words',
+        yaxis_title_text='Number of articles',
+        barmode='stack'  # The two histograms are drawn on top of another
+    )
+    return dcc.Graph(id='word-count', figure=fig)
 
 
-def reading_time_plot(data: List[Dict]) -> html.Div:
-    reading_times = get_reading_time(data)
-    fig = px.histogram(
-        x=reading_times,
-        labels={'x': f'Estimated reading time (minutes) with reading speed = {DEFAULT_READING_SPEED} wpm'}
+def reading_time_plot(data: List[Dict]) -> dcc.Graph:
+    fig = go.Figure()
+    fig.add_trace(go.Histogram(
+        x=get_reading_time(data, filters=[['status', '=', 0]]),  # unread
+        name='Unread articles',
+    ))
+    fig.add_trace(go.Histogram(
+        x=get_reading_time(data, filters=[['status', '=', 1]]),  # archived
+        name='Archived articles',
+    ))
+    fig.update_layout(
+        title_text='Reading Time',  # title of plot
+        xaxis_title_text=f'Estimated reading time (minutes) with reading speed = {DEFAULT_READING_SPEED} wpm',
+        yaxis_title_text='Number of articles',
+        barmode='stack'  # The two histograms are drawn on top of another
     )
     return dcc.Graph(id='reading-time', figure=fig)
 
 
 def domain_counts_plot(data: List[Dict], limit: int = 20) -> dcc.Graph:
-    pairs = list(get_domain_counts(data).items())
-    pairs.sort(key=lambda p: -p[1])  # sort desc by count
-    pairs = pairs[:limit]  # display top items only
-    pairs.reverse()  # because px.bar display the items in a reversed order
-    fig = px.bar(x=[p[1] for p in pairs],
-                 y=[p[0] for p in pairs],
-                 orientation='h', labels={'x': 'Number of articles', 'y': 'Domain'})
+    top_pairs = list(get_domain_counts(data).items())  # both unread + archived
+    top_pairs.sort(key=lambda p: -p[1])  # sort desc by count
+    top_pairs = top_pairs[:limit]  # display top items only
+    top_pairs.reverse()  # because px.bar display the items in a reversed order
+    top_domains = [p[0] for p in top_pairs]
+    unread_domain_cnts = get_domain_counts(data, filters=[['status', '=', 0]])
+    archived_domain_cnts = get_domain_counts(data, filters=[['status', '=', 1]])
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=[unread_domain_cnts.get(d, 0) for d in top_domains],
+        y=top_domains,
+        name='Unread articles',
+        orientation='h',
+    ))
+    fig.add_trace(go.Bar(
+        x=[archived_domain_cnts.get(d, 0) for d in top_domains],
+        y=top_domains,
+        name='Archived articles',
+        orientation='h',
+    ))
+    fig.update_layout(barmode='stack')
     return dcc.Graph(id='domain-counts', figure=fig)
 
 
