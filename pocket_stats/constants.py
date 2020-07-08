@@ -3,9 +3,9 @@ import logging
 import os
 
 
-CONSUMER_KEY = os.environ['POCKET_TOOLS_CONSUMER_KEY']
-ACCESS_TOKEN = os.environ['POCKET_TOOLS_ACCESS_TOKEN']
-CACHE_FILE = os.environ.get('POCKET_TOOLS_CACHE_FILE', os.path.expanduser('~/pocket-tools.cache'))
+CONSUMER_KEY = os.environ['POCKET_STATS_CONSUMER_KEY']
+ACCESS_TOKEN = os.environ['POCKET_STATS_ACCESS_TOKEN']
+CACHE_FILE = os.environ.get('POCKET_STATS_CACHE_FILE', os.path.expanduser('~/pocket-tools.cache'))
 DEFAULT_READING_SPEED = 225  # words per minute
 
 root = logging.getLogger()
