@@ -12,3 +12,4 @@ jobs:
           architecture: x64
       - run: make setup
       - run: make check
+      - run: bash <(curl -s https://codecov.io/bash)
