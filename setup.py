@@ -33,6 +33,7 @@ setup(
         'plotly',
         'nltk',
         'tldextract',
+        'pandas',
     ],
     tests_require=['pytest', 'pytest-cov'],
     zip_safe=False

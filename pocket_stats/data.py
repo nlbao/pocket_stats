@@ -12,7 +12,6 @@ import pandas as pd
 from constants import CACHE_FILE, CONSUMER_KEY, ACCESS_TOKEN, DEFAULT_READING_SPEED
 
 
-api = Pocket(consumer_key=CONSUMER_KEY, access_token=ACCESS_TOKEN)
 try:
     nltk.data.find('corpora/stopwords')
 except LookupError:
@@ -21,6 +20,8 @@ invalid_words = stopwords.words('english')
 
 
 def fetch_data(offset: int = 0, limit: int = None, overwrite_cache: bool = False) -> List[Dict]:
+    assert (CONSUMER_KEY is not None) and (ACCESS_TOKEN is not None), 'Please set value for these environment variables'
+    api = Pocket(consumer_key=CONSUMER_KEY, access_token=ACCESS_TOKEN)
     ans = []
     count = 500
     if limit is not None:
