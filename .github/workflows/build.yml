@@ -1,5 +1,5 @@
-# .github/workflows/tests.yml
-name: Tests
+# .github/workflows/build.yml
+name: build
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
     branches: [master, staging]
 
 jobs:
-  tests:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
