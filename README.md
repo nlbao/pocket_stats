@@ -16,6 +16,12 @@ A tool to analyze your Pocket reading list (https://app.getpocket.com/).
       - [Load cached data](#load-cached-data)
       - [Extract useful information](#extract-useful-information)
     - [Visualization](#visualization)
+      - [Word Cloud](#word-cloud)
+      - [Article Count timeseries](#article-count-timeseries)
+      - [Word Count distribution](#word-count-distribution)
+      - [Reading Speed & Reading Time](#reading-speed--reading-time)
+      - [Top Domains](#top-domains)
+      - [Language & Favorite](#language--favorite)
   - [Test](#test)
   - [Deployment](#deployment)
   - [Contribute](#contribute)
@@ -139,7 +145,25 @@ Start the application (webserver) by running the commands below:
     # You will see something like this:
     # Dash is running on http://127.0.0.1:8050/
 ```
-Then enter http://127.0.0.1:8050/ in your web browser.
+Then enter http://127.0.0.1:8050/ in your web browser. The site contains multiple components:
+
+#### Word Cloud
+![word_cloud](docs/images/word_cloud.png)
+
+#### Article Count timeseries
+![article_count](docs/images/article_count.png)
+
+#### Word Count distribution
+![word_count](docs/images/word_count.png)
+
+#### Reading Speed & Reading Time
+![reading_time](docs/images/reading_time.png)
+
+#### Top Domains
+![top_domains](docs/images/top_domains.png)
+
+#### Language & Favorite
+![language_favorite](docs/images/language_favorite.png)
 
 ## Test
 ```bash
@@ -147,7 +171,6 @@ Then enter http://127.0.0.1:8050/ in your web browser.
 ```
 
 ## Deployment
-
 You can deploy the `app.py` as a webserver.
 
 Example: https://dash.plotly.com/deployment.
@@ -163,7 +186,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 
 ## License
-MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+MIT License - see the [LICENSE.md](LICENSE) file for details.
 
 
 ## Acknowledgments
