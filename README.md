@@ -1,3 +1,4 @@
+[![PyPI version](https://badge.fury.io/py/pocket-stats.svg)](https://badge.fury.io/py/pocket-stats)
 ![build](https://github.com/nlbao/pocket_stats/workflows/build/badge.svg)
 [![codecov](https://codecov.io/gh/nlbao/pocket_stats/branch/master/graph/badge.svg)](https://codecov.io/gh/nlbao/pocket_stats)
 
@@ -148,22 +149,25 @@ Start the application (webserver) by running the commands below:
 Then enter http://127.0.0.1:8050/ in your web browser. The site contains multiple components:
 
 #### Word Cloud
-![word_cloud](docs/images/word_cloud.png)
+![word_cloud](https://user-images.githubusercontent.com/4289177/87027187-cca22180-c1aa-11ea-89cb-ae1b91493934.png)
 
 #### Article Count timeseries
-![article_count](docs/images/article_count.png)
+![article_count](https://user-images.githubusercontent.com/4289177/87027476-38848a00-c1ab-11ea-9115-925dc0660815.png)
 
 #### Word Count distribution
-![word_count](docs/images/word_count.png)
+Stacked histograms
+![word_count](https://user-images.githubusercontent.com/4289177/87027494-3de1d480-c1ab-11ea-9bfd-ded18cb4025b.png)
 
 #### Reading Speed & Reading Time
-![reading_time](docs/images/reading_time.png)
+Stacked histograms
+![reading_time](https://user-images.githubusercontent.com/4289177/87027500-3fab9800-c1ab-11ea-8a57-be4cb7eaf168.png)
 
 #### Top Domains
-![top_domains](docs/images/top_domains.png)
+Stacked bar charts.
+![top_domains](https://user-images.githubusercontent.com/4289177/87027511-420df200-c1ab-11ea-85c9-08f08f546caf.png)
 
 #### Language & Favorite
-![language_favorite](docs/images/language_favorite.png)
+![language_favorite](https://user-images.githubusercontent.com/4289177/87027522-463a0f80-c1ab-11ea-8436-352adc72266b.png)
 
 ## Test
 ```bash
