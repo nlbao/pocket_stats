@@ -61,6 +61,16 @@ Set necessary environment variables:
 
 ### Data Querying
 #### Fetch data from the Pocket server and cache it
+Command line:
+```bash
+    # read only
+    python -m pocket_stats fetch-data --offset 0 --limit 2
+
+    # to write ALL the items to cache
+    python -m pocket_stats fetch-data --overwrite_cache
+```
+
+Or in python code:
 ```python
     from pocket_stats.data import fetch_data
 
@@ -140,13 +150,24 @@ The default location of cache file is `~/pocket-tools.cache`, you can change it 
 ### Visualization
 Start the application (webserver) by running the commands below:
 ```bash
-    cd </project/repo/dir/>
-    python pocket_stats/app.py
+    python -m pocket_stats webapp
 
     # You will see something like this:
     # Dash is running on http://127.0.0.1:8050/
 ```
-Then enter http://127.0.0.1:8050/ in your web browser. The site contains multiple components:
+
+Other parameters:
+```bash
+    python -m pocket_stats webapp --help
+
+    # Usage: __main__.py webapp [OPTIONS]
+    # Options:
+    # --debug         Debug mode
+    # --port INTEGER  Port of the web server. Default = 8050.
+    # --help          Show this message and exit.
+```
+
+Enter http://127.0.0.1:8050/ in your web browser. The site contains multiple components:
 
 #### Word Cloud
 ![word_cloud](https://user-images.githubusercontent.com/4289177/87027187-cca22180-c1aa-11ea-89cb-ae1b91493934.png)

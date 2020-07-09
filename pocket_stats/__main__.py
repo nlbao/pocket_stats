@@ -1,3 +1,4 @@
+import click
 import random
 import plotly
 import pandas as pd
@@ -9,6 +10,7 @@ from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 import plotly.express as px
 
+from data import fetch_data as _fetch_data
 from data import load_cache, count_words_in_title, get_word_counts, get_reading_time, get_domain_counts
 from data import get_added_time_series, get_archived_time_series, get_language_counts, get_favorite_count
 from constants import DEFAULT_READING_SPEED
@@ -197,7 +199,21 @@ def favorite_count_plot(data: List[Dict]) -> html.Div:
     )
 
 
-if __name__ == '__main__':
+@click.command()
+@click.option('--offset', type=int, default=0, help='First item position to be fetched')
+@click.option('--limit', type=int, default=None, help='Number of items to be fetched')
+@click.option('--overwrite_cache', is_flag=True, help='Will overwrite the local cache')
+def fetch_data(offset: int, limit: int, overwrite_cache: bool) -> None:
+    ans = _fetch_data(offset, limit, overwrite_cache)
+    if len(ans) > 0:
+        print('Sample record:')
+        print(ans[0])
+
+
+@click.command()
+@click.option('--debug', is_flag=True, help='Debug mode')
+@click.option('--port', type=int, default=8050, help='Port of the web server. Default = 8050.')
+def webapp(debug, port):
     app.title = "Pocket Analyzer"
     app.layout = html.Div(style={}, children=[
         word_cloud_plot(data),
@@ -206,4 +222,17 @@ if __name__ == '__main__':
         domain_counts_plot(data),
         plot_two_columns(language_counts_plot(data), favorite_count_plot(data)),
     ])
-    app.run_server(debug=True)  # TODO: add command line option --debug
+    app.run_server(debug=debug, port=port)
+
+
+@click.group()
+def cli():
+    pass
+
+
+cli.add_command(fetch_data)
+cli.add_command(webapp)
+
+
+if __name__ == '__main__':
+    cli()
