@@ -1,0 +1,26 @@
+# .github/workflows/release_dev.yml
+name: release_dev
+
+on:
+  push:
+    branches: [dev]
+
+jobs:
+  release-package:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - run: make setup
+      - run: python3 setup.py sdist
+      - name: Publish distribution to Test PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.test_pypi_password }}
+          repository_url: https://test.pypi.org/legacy/
