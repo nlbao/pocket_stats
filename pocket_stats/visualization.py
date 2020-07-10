@@ -113,9 +113,11 @@ def get_reading_time_chart(reading_speed: int) -> go.Figure:
     return fig
 
 
-def get_reading_time_needed(reading_speed: int) -> str:
+def get_reading_time_needed(reading_speed: int, reading_minutes_daily: int) -> str:
     total_minutes = int(sum(get_reading_time(data, reading_speed=reading_speed, filters=[['status', '=', 0]])))
-    days, hours, minutes = int(int(total_minutes/24)/60), int(total_minutes/60) % 24, total_minutes % 60
+    days = int(total_minutes / reading_minutes_daily)
+    hours = int((total_minutes % reading_minutes_daily) / 60)
+    minutes = total_minutes % 60
     ans = ''
     if days > 0:
         ans += f' {days} days'
@@ -123,8 +125,9 @@ def get_reading_time_needed(reading_speed: int) -> str:
         ans += f' {hours} hours'
     if minutes > 0:
         ans += f' {minutes} minutes'
+    title = f'Total reading time needed (with {reading_speed} words / minute and {reading_minutes_daily} minutes / day)'
     return html.Div([
-        html.H3(children='Total reading time needed', className='center-text'),
+        html.H3(children=title, className='center-text'),
         html.Div(children=ans, className='center-text highlight'),
     ])
 
@@ -132,23 +135,31 @@ def get_reading_time_needed(reading_speed: int) -> str:
 @ app.callback(
     [Output(component_id='reading-time', component_property='figure'),
      Output(component_id='reading-time-needed', component_property='children')],
-    [Input(component_id='reading-speed', component_property='value')]
+    [Input(component_id='reading-speed', component_property='value'),
+     Input(component_id='reading-minutes-daily', component_property='value')]
 
 
 )
-def update_reading_time_components(reading_speed: int) -> Tuple[go.Figure, str]:
+def update_reading_time_components(reading_speed: int, reading_minutes_daily: int) -> Tuple[go.Figure, str]:
     return (get_reading_time_chart(reading_speed),
-            get_reading_time_needed(reading_speed))
+            get_reading_time_needed(reading_speed, reading_minutes_daily))
 
 
 def reading_time_plot(data: List[Dict]) -> html.Div:
     max_reading_speed = DEFAULT_READING_SPEED * 3
+    max_reading_minutes_daily = 24 * 60
     return html.Div([
-        html.H3(children='Reading speed (wpm)', className='center-text'),
+        html.H3(children='Reading speed (words / minute)', className='center-text'),
         dcc.Slider(
             id='reading-speed',
             marks={i: str(i) for i in range(100, max_reading_speed, 100)},
             min=1, max=max_reading_speed, step=10, value=DEFAULT_READING_SPEED
+        ),
+        html.H3(children='Reading time spent daily (minutes / day)', className='center-text'),
+        dcc.Slider(
+            id='reading-minutes-daily',
+            marks={i: str(i) for i in range(120, max_reading_minutes_daily, 240)},
+            min=10, max=max_reading_minutes_daily, step=10, value=60,
         ),
         html.Div(id='reading-time-needed', children=''),
         dcc.Graph(id='reading-time', figure=go.Figure()),  # figure will be updated by update_reading_time_components()
