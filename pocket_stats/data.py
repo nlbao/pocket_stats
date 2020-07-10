@@ -9,7 +9,7 @@ from typing import List, Dict
 from collections import Counter
 from nltk.corpus import stopwords
 import pandas as pd
-from constants import CACHE_FILE, CONSUMER_KEY, ACCESS_TOKEN, DEFAULT_READING_SPEED
+from constants import CACHE_FILE, CONSUMER_KEY, ACCESS_TOKEN, DEFAULT_READING_SPEED, DEFAULT_TZINFO
 
 
 # ------- Helper functions ------- #
@@ -40,6 +40,10 @@ def normalize_language_name(lang: str) -> str:
 def get_domain_from_url(url: str) -> str:
     extract_result = tldextract.extract(url)
     return extract_result.domain + '.' + extract_result.suffix
+
+
+def epoch_to_yyymmdd(epoch: int):
+    return datetime.fromtimestamp(int(epoch), tz=DEFAULT_TZINFO).strftime('%Y%m%d')
 
 
 # ------- Main functions ------- #
@@ -122,19 +126,21 @@ def get_reading_time(data: List[Dict],
 
 
 def get_added_time_series(data: List[Dict]) -> pd.DataFrame:
-    added_date_counts = Counter(datetime.fromtimestamp(int(record['time_added'])).strftime('%Y%m%d') for record in data)
+    added_date_counts = Counter(epoch_to_yyymmdd(record['time_added']) for record in data)
     df = pd.DataFrame.from_dict({datetime.strptime(d, '%Y%m%d'): cnt for d, cnt in added_date_counts.items()},
                                 orient='index', columns=['All articles'])
+    df.index = df.index.tz_localize('UTC')
     return df
 
 
 def get_archived_time_series(data: List[Dict]) -> pd.DataFrame:
     archived_date_counts = Counter(
-        datetime.fromtimestamp(int(record['time_updated'])).strftime('%Y%m%d')
-        for record in data if int(record['status']) == 1
+        epoch_to_yyymmdd(record['time_added']) for record in data
+        if int(record['status']) == 1
     )
     df = pd.DataFrame.from_dict({datetime.strptime(d, '%Y%m%d'): cnt for d, cnt in archived_date_counts.items()},
                                 orient='index', columns=['Archived articles'])
+    df.index = df.index.tz_localize('UTC')
     return df
 
 
