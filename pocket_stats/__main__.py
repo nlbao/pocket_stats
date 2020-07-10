@@ -1,6 +1,6 @@
 import click
 from data import fetch_data as _fetch_data
-from visualization import app as visualization_app
+from visualization import create_app
 
 
 @click.command()
@@ -18,7 +18,8 @@ def fetch_data(offset: int, limit: int, overwrite_cache: bool) -> None:
 @click.option('--debug', is_flag=True, help='Debug mode')
 @click.option('--port', type=int, default=8050, help='Port of the web server. Default = 8050.')
 def webapp(debug: bool, port: int) -> None:
-    visualization_app.run_server(debug=debug, port=port)
+    app = create_app()
+    app.run_server(debug=debug, port=port)
 
 
 @click.group()

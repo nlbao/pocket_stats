@@ -3,6 +3,7 @@ import pytest
 from typing import List, Dict
 from collections import Counter
 from datetime import datetime
+import pandas as pd
 from unittest.mock import patch
 
 from pocket_stats.data import fetch_data, load_cache, is_valid_word, normalize_language_name, get_domain_from_url
@@ -47,9 +48,10 @@ def data():
     return load_cache(cache_file=os.path.join(CURRENT_DIR, 'test_cache_data.json'))
 
 
-def to_datetime(s: str, date_format='%Y-%m-%d %H:%M:%S') -> object:
+def to_datetime(s: str, date_format='%Y-%m-%d %H:%M:%S') -> pd.Timestamp:
     # ex: 2020-07-03 00:00:00
-    return datetime.strptime(s, date_format)
+    # return datetime.strptime(s, date_format)
+    return pd.Timestamp(s)
 
 
 def test_load_cache(data: List[Dict]):
