@@ -3,7 +3,7 @@ import os
 import json
 import logging
 import tldextract
-from datetime import datetime
+from datetime import datetime, timedelta
 from pocket import Pocket
 from typing import List, Dict
 from collections import Counter
@@ -119,6 +119,17 @@ def get_archived_time_series(data: List[Dict]) -> pd.DataFrame:
     df = pd.DataFrame.from_dict({datetime.strptime(d, '%Y%m%d'): cnt for d, cnt in added_date_counts.items()},
                                 orient='index', columns=['Archived articles'])
     return df
+
+
+def get_average_readed_word(data: List[Dict], n_last_days: int) -> float:
+    # find the ones that are archived, time_updated >= min_date
+    min_date = datetime.now() - timedelta(days=n_last_days)
+    records = [
+        record for record in data
+        if (int(record['status']) == 1) and (datetime.fromtimestamp(int(record['time_updated'])) >= min_date)
+    ]
+    word_counts = get_word_counts(records)
+    return 0 if len(word_counts) == 0 else sum(word_counts) / len(word_counts)
 
 
 def get_domain_from_url(url: str) -> str:
