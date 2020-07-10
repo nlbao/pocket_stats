@@ -1,5 +1,5 @@
 setup:
-	pip install pytest pytest-cov flake8
+	pip install pytest pytest-cov flake8 twine
 	pip install .
 
 clean-pyc:
@@ -21,3 +21,12 @@ lint:
 	python -m flake8 .
 
 check: test lint
+
+test-package:
+	rm -rf ./dist
+	python3 setup.py sdist
+	twine check dist/*
+
+release-package:
+	python3 setup.py register sdist
+	twine upload dist/*

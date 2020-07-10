@@ -3,19 +3,17 @@ import plotly
 import pandas as pd
 from typing import List, Dict, Tuple, Any
 import dash
+import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 import plotly.express as px
 
-from data import load_cache, count_words_in_title, get_word_counts, get_reading_time, get_domain_counts
-from data import get_added_time_series, get_archived_time_series, get_language_counts, get_favorite_count
+from data import load_cache, count_words_in_title, get_word_counts, get_reading_time, get_average_readed_word
+from data import get_added_time_series, get_archived_time_series
+from data import get_language_counts, get_favorite_count, get_domain_counts
 from constants import DEFAULT_READING_SPEED
-
-
-app = dash.Dash()
-data = load_cache()
 
 
 def plot_two_columns(col0: Any, col1: Any) -> html.Div:
@@ -61,6 +59,14 @@ def articles_over_time_plot(data: List[Dict], should_cumsum: bool = True) -> dcc
 
 
 def word_counts_plot(data: List[Dict]) -> dcc.Graph:
+    n_last_day_options = [360, 90, 30, 7, 2]
+    avg_readed_words = [int(get_average_readed_word(data, n_last_day)) for n_last_day in n_last_day_options]
+    avg_readed_words_table = dash_table.DataTable(
+        id='readed-words',
+        columns=[{'name': f'{i} days', 'id': f'{i}_days'} for i in n_last_day_options],
+        data=[{f'{i}_days': avg_readed_words[pos] for pos, i in enumerate(n_last_day_options)}],
+    )
+    # histogram
     fig = go.Figure()
     fig.add_trace(go.Histogram(
         x=get_word_counts(data, filters=[['status', '=', 0]]),  # unread
@@ -76,11 +82,15 @@ def word_counts_plot(data: List[Dict]) -> dcc.Graph:
         yaxis_title_text='Number of articles',
         barmode='stack'  # The two histograms are drawn on top of another
     )
-    return dcc.Graph(id='word-count', figure=fig)
+    return html.Div([
+        html.H3(children='Average readed words recently (words / day)', className='center-text'),
+        avg_readed_words_table,
+        dcc.Graph(id='word-count', figure=fig)
+    ])
 
 
 # -------------------- Reading time -------------------- #
-def get_reading_time_chart(reading_speed: int) -> go.Figure:
+def get_reading_time_chart(data: List[Dict], reading_speed: int) -> go.Figure:
     fig = go.Figure()
     fig.add_trace(go.Histogram(
         x=get_reading_time(data, reading_speed=reading_speed, filters=[['status', '=', 0]]),  # unread
@@ -99,9 +109,11 @@ def get_reading_time_chart(reading_speed: int) -> go.Figure:
     return fig
 
 
-def get_reading_time_needed(reading_speed: int) -> str:
+def get_reading_time_needed(data: List[Dict], reading_speed: int, reading_minutes_daily: int) -> html.Div:
     total_minutes = int(sum(get_reading_time(data, reading_speed=reading_speed, filters=[['status', '=', 0]])))
-    days, hours, minutes = int(int(total_minutes/24)/60), int(total_minutes/60) % 24, total_minutes % 60
+    days = int(total_minutes / reading_minutes_daily)
+    hours = int((total_minutes % reading_minutes_daily) / 60)
+    minutes = total_minutes % 60
     ans = ''
     if days > 0:
         ans += f' {days} days'
@@ -109,30 +121,28 @@ def get_reading_time_needed(reading_speed: int) -> str:
         ans += f' {hours} hours'
     if minutes > 0:
         ans += f' {minutes} minutes'
+    title = f'Total reading time needed (with {reading_speed} words / minute and {reading_minutes_daily} minutes / day)'
     return html.Div([
-        html.H3(children='Total reading time needed', className='center-text'),
+        html.H3(children=title, className='center-text'),
         html.Div(children=ans, className='center-text highlight'),
     ])
 
 
-@app.callback(
-    [Output(component_id='reading-time', component_property='figure'),
-     Output(component_id='reading-time-needed', component_property='children')],
-    [Input(component_id='reading-speed', component_property='value')]
-)
-def update_reading_time_components(reading_speed: int) -> Tuple[go.Figure, str]:
-    return (get_reading_time_chart(reading_speed),
-            get_reading_time_needed(reading_speed))
-
-
 def reading_time_plot(data: List[Dict]) -> html.Div:
     max_reading_speed = DEFAULT_READING_SPEED * 3
+    max_reading_minutes_daily = 24 * 60
     return html.Div([
-        html.H3(children='Reading speed (wpm)', className='center-text'),
+        html.H3(children='Reading speed (words / minute)', className='center-text'),
         dcc.Slider(
             id='reading-speed',
             marks={i: str(i) for i in range(100, max_reading_speed, 100)},
             min=1, max=max_reading_speed, step=10, value=DEFAULT_READING_SPEED
+        ),
+        html.H3(children='Reading time spent daily (minutes / day)', className='center-text'),
+        dcc.Slider(
+            id='reading-minutes-daily',
+            marks={i: str(i) for i in range(120, max_reading_minutes_daily, 240)},
+            min=10, max=max_reading_minutes_daily, step=10, value=60,
         ),
         html.Div(id='reading-time-needed', children=''),
         dcc.Graph(id='reading-time', figure=go.Figure()),  # figure will be updated by update_reading_time_components()
@@ -197,8 +207,11 @@ def favorite_count_plot(data: List[Dict]) -> html.Div:
     )
 
 
-if __name__ == '__main__':
-    app.title = "Pocket Analyzer"
+def create_app(data: List[Dict] = None) -> dash.Dash:
+    if data is None:
+        data = load_cache()
+    app = dash.Dash()
+    app.title = "Pocket Stats"
     app.layout = html.Div(style={}, children=[
         word_cloud_plot(data),
         articles_over_time_plot(data),
@@ -206,4 +219,15 @@ if __name__ == '__main__':
         domain_counts_plot(data),
         plot_two_columns(language_counts_plot(data), favorite_count_plot(data)),
     ])
-    app.run_server(debug=True)  # TODO: add command line option --debug
+
+    @app.callback(
+        [Output(component_id='reading-time', component_property='figure'),
+         Output(component_id='reading-time-needed', component_property='children')],
+        [Input(component_id='reading-speed', component_property='value'),
+         Input(component_id='reading-minutes-daily', component_property='value')]
+    )
+    def update_reading_time_components(reading_speed: int, reading_minutes_daily: int) -> Tuple[go.Figure, str]:
+        return (get_reading_time_chart(data, reading_speed),
+                get_reading_time_needed(data, reading_speed, reading_minutes_daily))
+
+    return app

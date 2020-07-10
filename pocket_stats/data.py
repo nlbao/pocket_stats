@@ -3,25 +3,54 @@ import os
 import json
 import logging
 import tldextract
-from datetime import datetime
+from datetime import datetime, timedelta
 from pocket import Pocket
 from typing import List, Dict
 from collections import Counter
 from nltk.corpus import stopwords
 import pandas as pd
-from constants import CACHE_FILE, CONSUMER_KEY, ACCESS_TOKEN, DEFAULT_READING_SPEED
+from constants import CACHE_FILE, CONSUMER_KEY, ACCESS_TOKEN, DEFAULT_READING_SPEED, DEFAULT_TZINFO
 
 
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords')
+# ------- Helper functions ------- #
+def download_ntlk():
+    try:
+        nltk.data.find('corpora/stopwords')
+    except LookupError:
+        nltk.download('stopwords')
+
+
+download_ntlk()
 invalid_words = stopwords.words('english')
 
 
-def fetch_data(offset: int = 0, limit: int = None, overwrite_cache: bool = False) -> List[Dict]:
-    assert (CONSUMER_KEY is not None) and (ACCESS_TOKEN is not None), 'Please set value for these environment variables'
-    api = Pocket(consumer_key=CONSUMER_KEY, access_token=ACCESS_TOKEN)
+def is_valid_word(w):
+    if len(w) == 0:
+        return False
+    return w not in invalid_words
+
+
+def normalize_language_name(lang: str) -> str:
+    lang = lang.strip()
+    if len(lang) == 0:
+        return 'unknown'
+    return lang
+
+
+def get_domain_from_url(url: str) -> str:
+    extract_result = tldextract.extract(url)
+    return extract_result.domain + '.' + extract_result.suffix
+
+
+def epoch_to_yyymmdd(epoch: int):
+    return datetime.fromtimestamp(int(epoch), tz=DEFAULT_TZINFO).strftime('%Y%m%d')
+
+
+# ------- Main functions ------- #
+def fetch_data(offset: int = 0, limit: int = None, overwrite_cache: bool = False,
+               consumer_key: str = CONSUMER_KEY, access_token: str = ACCESS_TOKEN) -> List[Dict]:
+    assert (consumer_key is not None) and (access_token is not None), 'Please set value for these environment variables'
+    api = Pocket(consumer_key=consumer_key, access_token=access_token)
     ans = []
     count = 500
     if limit is not None:
@@ -46,19 +75,11 @@ def fetch_data(offset: int = 0, limit: int = None, overwrite_cache: bool = False
     return ans
 
 
-def load_cache() -> List[Dict]:
-    if not os.path.isfile(CACHE_FILE):
+def load_cache(cache_file: str = CACHE_FILE) -> List[Dict]:
+    if not os.path.isfile(cache_file):
         return []
-    with open(CACHE_FILE, 'r') as fi:
+    with open(cache_file, 'r') as fi:
         return json.load(fi)
-
-
-def is_valid_word(w):
-    if len(w) == 0:
-        return False
-    if w in invalid_words:
-        return False
-    return True
 
 
 # filter format: [key, operation, expected_value]
@@ -105,38 +126,39 @@ def get_reading_time(data: List[Dict],
 
 
 def get_added_time_series(data: List[Dict]) -> pd.DataFrame:
-    added_date_counts = Counter(datetime.fromtimestamp(int(record['time_added'])).strftime('%Y%m%d') for record in data)
+    added_date_counts = Counter(epoch_to_yyymmdd(record['time_added']) for record in data)
     df = pd.DataFrame.from_dict({datetime.strptime(d, '%Y%m%d'): cnt for d, cnt in added_date_counts.items()},
                                 orient='index', columns=['All articles'])
+    df.index = df.index.tz_localize('UTC')
     return df
 
 
 def get_archived_time_series(data: List[Dict]) -> pd.DataFrame:
-    added_date_counts = Counter(
-        datetime.fromtimestamp(int(record['time_updated'])).strftime('%Y%m%d')
-        for record in data if int(record['status']) == 1
+    archived_date_counts = Counter(
+        epoch_to_yyymmdd(record['time_added']) for record in data
+        if int(record['status']) == 1
     )
-    df = pd.DataFrame.from_dict({datetime.strptime(d, '%Y%m%d'): cnt for d, cnt in added_date_counts.items()},
+    df = pd.DataFrame.from_dict({datetime.strptime(d, '%Y%m%d'): cnt for d, cnt in archived_date_counts.items()},
                                 orient='index', columns=['Archived articles'])
+    df.index = df.index.tz_localize('UTC')
     return df
 
 
-def get_domain_from_url(url: str) -> str:
-    extract_result = tldextract.extract(url)
-    return extract_result.domain + '.' + extract_result.suffix
+def get_average_readed_word(data: List[Dict], n_last_days: int) -> float:
+    # find the ones that are archived, time_updated >= min_date
+    min_date = datetime.now() - timedelta(days=n_last_days)
+    records = [
+        record for record in data
+        if (int(record['status']) == 1) and (datetime.fromtimestamp(int(record['time_updated'])) >= min_date)
+    ]
+    word_counts = get_word_counts(records)
+    return 0 if len(word_counts) == 0 else sum(word_counts) / len(word_counts)
 
 
 def get_domain_counts(data: List[Dict], filters: List[List] = []) -> Dict[str, int]:
     return Counter(get_domain_from_url(record['resolved_url'])
                    for record in data
                    if should_pass_filters(filters, record))
-
-
-def normalize_language_name(lang: str) -> str:
-    lang = lang.strip()
-    if len(lang) == 0:
-        return 'unknown'
-    return lang
 
 
 def get_language_counts(data: List[Dict]) -> Dict[str, int]:

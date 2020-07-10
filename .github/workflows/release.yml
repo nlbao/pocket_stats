@@ -1,0 +1,21 @@
+# .github/workflows/release.yml
+name: release
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  release-package:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - run: make setup
+      - run: make release-package
