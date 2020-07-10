@@ -1,9 +1,9 @@
-# .github/workflows/release.yml
-name: release
+# .github/workflows/release_dev.yml
+name: release_dev
 
 on:
   push:
-    branches: [master]
+    branches: [dev]
 
 jobs:
   release-package:
@@ -19,8 +19,9 @@ jobs:
           architecture: x64
       - run: make setup
       - run: python3 setup.py sdist
-      - name: Publish distribution to PyPI
+      - name: Publish distribution to Test PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
-          password: ${{ secrets.pypi_password }}
+          password: ${{ secrets.test_pypi_password }}
           skip_existing: true
+          repository_url: https://test.pypi.org/legacy/
