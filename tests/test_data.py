@@ -48,7 +48,8 @@ def data():
 
 
 def test_load_cache(data: List[Dict]):
-    assert load_cache('/this/path/is/invalid.cache') == []
+    with pytest.raises(FileNotFoundError):
+        load_cache('/this/path/is/invalid.cache')
     # no need to test with valid cached, because the fixture data already run load_cache(cache_file)
 
 
@@ -63,7 +64,7 @@ def test_fetch_data_ok(mocked_pocket_retrieve, mocked_open, mocked_json_dump):
 
 def test_fetch_data_failed():
     with pytest.raises(Exception):
-        fetch_data()
+        fetch_data(consumer_key='invalid', access_token='none')
 
 
 def raise_lookup_err_side_effect(*args, **kwargs):
