@@ -1,6 +1,8 @@
 [![PyPI version](https://badge.fury.io/py/pocket-stats.svg)](https://badge.fury.io/py/pocket-stats)
 ![build](https://github.com/nlbao/pocket_stats/workflows/build/badge.svg)
 [![codecov](https://codecov.io/gh/nlbao/pocket_stats/branch/master/graph/badge.svg)](https://codecov.io/gh/nlbao/pocket_stats)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/nlbao/pocket_stats.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/nlbao/pocket_stats/alerts/)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/nlbao/pocket_stats.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/nlbao/pocket_stats/context:python)
 
 # Pocket Stats
 
