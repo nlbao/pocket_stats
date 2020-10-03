@@ -13,7 +13,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='pocket_stats',
-    version='0.2.0',
+    version='0.2.1',
     description='Tools for the Pocket reading app https://app.getpocket.com/',
     long_description=long_description,
     long_description_content_type='text/markdown',
