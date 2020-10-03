@@ -35,6 +35,6 @@ setup(
         'tldextract',
         'pandas',
     ],
-    tests_require=['pytest', 'pytest-cov'],
+    tests_require=['pytest', 'pytest-cov', 'freezegun'],
     zip_safe=False
 )

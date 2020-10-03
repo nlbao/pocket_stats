@@ -4,6 +4,7 @@ from typing import List, Dict
 from collections import Counter
 import pandas as pd
 from unittest.mock import patch
+from freezegun import freeze_time
 
 from pocket_stats.data import fetch_data, load_cache, is_valid_word, normalize_language_name, get_domain_from_url
 from pocket_stats.data import should_pass_filters, count_words_in_title, get_word_counts, get_favorite_count
@@ -136,6 +137,7 @@ def test_get_archived_time_series(data: List[Dict]):
     }}
 
 
+@freeze_time("2020-07-01")
 def test_get_average_readed_word(data: List[Dict]):
     assert get_average_readed_word(data, 30) == 2724.5
 
