@@ -78,7 +78,7 @@ def fetch_data(offset: int = 0, limit: int = None, overwrite_cache: bool = False
 
 def load_cache(cache_file: str = CACHE_FILE) -> List[Dict]:
     if not os.path.isfile(cache_file):
-        logging.error(f"Missing cache file, please run 'python -m pocket_stats fetch-data --overwrite_cache'")
+        logging.error("Missing cache file, please run 'python -m pocket_stats fetch-data --overwrite_cache'")
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT),
                                 cache_file)
     with open(cache_file, 'r') as fi:
