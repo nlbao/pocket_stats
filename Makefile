@@ -1,5 +1,5 @@
 setup:
-	pip install pytest pytest-cov flake8 twine
+	pip install pytest pytest-cov flake8 twine freezegun
 	pip install .
 
 clean-pyc:

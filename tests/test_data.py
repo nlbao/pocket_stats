@@ -4,6 +4,7 @@ from typing import List, Dict
 from collections import Counter
 import pandas as pd
 from unittest.mock import patch
+from freezegun import freeze_time
 
 from pocket_stats.data import fetch_data, load_cache, is_valid_word, normalize_language_name, get_domain_from_url
 from pocket_stats.data import should_pass_filters, count_words_in_title, get_word_counts, get_favorite_count
@@ -48,7 +49,8 @@ def data():
 
 
 def test_load_cache(data: List[Dict]):
-    assert load_cache('/this/path/is/invalid.cache') == []
+    with pytest.raises(FileNotFoundError):
+        load_cache('/this/path/is/invalid.cache')
     # no need to test with valid cached, because the fixture data already run load_cache(cache_file)
 
 
@@ -63,7 +65,7 @@ def test_fetch_data_ok(mocked_pocket_retrieve, mocked_open, mocked_json_dump):
 
 def test_fetch_data_failed():
     with pytest.raises(Exception):
-        fetch_data()
+        fetch_data(consumer_key='invalid', access_token='none')
 
 
 def raise_lookup_err_side_effect(*args, **kwargs):
@@ -135,6 +137,7 @@ def test_get_archived_time_series(data: List[Dict]):
     }}
 
 
+@freeze_time("2020-07-01")
 def test_get_average_readed_word(data: List[Dict]):
     assert get_average_readed_word(data, 30) == 2724.5
 
