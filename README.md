@@ -80,7 +80,7 @@ Or in python code:
     data = fetch_data(offset=0, limit=100, overwrite_cache=False)
 
     # fetch ALL items, will overwrite cache
-    data = fetch_data(ovewrite_cache=True)
+    data = fetch_data(overwrite_cache=True)
 ```
 The default location of cache file is `~/pocket-tools.cache`, you can change it using the `POCKET_STATS_CACHE_FILE` environment variable.
 
