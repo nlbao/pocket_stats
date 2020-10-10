@@ -175,3 +175,8 @@ def get_favorite_count(data: List[Dict]) -> Dict[str, int]:
         'count': cnt,
         'percent': 1.0 * cnt / total if total > 0 else 0,
     }
+
+
+def get_unread_count(data: List[Dict]) -> int:
+    df = pd.DataFrame.from_dict(data)
+    return df.query("status == '0'").status.count()

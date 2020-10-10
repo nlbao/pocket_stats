@@ -10,6 +10,7 @@ from pocket_stats.data import fetch_data, load_cache, is_valid_word, normalize_l
 from pocket_stats.data import should_pass_filters, count_words_in_title, get_word_counts, get_favorite_count
 from pocket_stats.data import get_reading_time, get_added_time_series, get_archived_time_series
 from pocket_stats.data import get_average_readed_word, get_domain_counts, get_language_counts, download_ntlk
+from pocket_stats.data import get_unread_count
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -153,3 +154,7 @@ def test_get_language_counts(data: List[Dict]):
 
 def test_get_favorite_count(data: List[Dict]):
     assert get_favorite_count(data) == {'count': 2, 'percent': 0.2857142857142857}
+
+
+def test_get_unread_count(data: List[Dict]):
+    assert get_unread_count(data) == 5
