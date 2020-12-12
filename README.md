@@ -55,11 +55,55 @@ A tool to analyze your Pocket reading list (https://app.getpocket.com/).
 
 
 ## Usage
-Set necessary environment variables:
+
 ```bash
+    # Set necessary environment variables:
     export POCKET_STATS_CONSUMER_KEY='<your_pocket_consumer_key>'
     export POCKET_STATS_ACCESS_TOKEN='<your_pocket_access_token>'
+    
+    # run this command only at the first time, or when you need to update the data
+    python3 -m pocket_stats fetch-data --overwrite_cache
+    
+    # Start the webserver
+    python -m pocket_stats webapp  
+    
+    # You will see something like this:
+    # Dash is running on http://127.0.0.1:8050/
 ```
+Go to http://127.0.0.1:8050/ from your web browser.
+
+Other parameters:
+```bash
+    python3 -m pocket_stats webapp --help
+
+    # Usage: __main__.py webapp [OPTIONS]
+    # Options:
+    # --debug         Debug mode
+    # --port INTEGER  Port of the web server. Default = 8050.
+    # --help          Show this message and exit.
+```
+
+### Visualization
+#### Word Cloud
+![word_cloud](https://user-images.githubusercontent.com/4289177/87027187-cca22180-c1aa-11ea-89cb-ae1b91493934.png)
+
+#### Article Count timeseries
+![article_count](https://user-images.githubusercontent.com/4289177/87027476-38848a00-c1ab-11ea-9115-925dc0660815.png)
+
+#### Word Count distribution
+Stacked histograms
+![word_count](https://user-images.githubusercontent.com/4289177/87027494-3de1d480-c1ab-11ea-9bfd-ded18cb4025b.png)
+
+#### Reading Speed & Reading Time
+Stacked histograms
+![reading_time](https://user-images.githubusercontent.com/4289177/87027500-3fab9800-c1ab-11ea-8a57-be4cb7eaf168.png)
+
+#### Top Domains
+Stacked bar charts.
+![top_domains](https://user-images.githubusercontent.com/4289177/87027511-420df200-c1ab-11ea-85c9-08f08f546caf.png)
+
+#### Language & Favorite
+![language_favorite](https://user-images.githubusercontent.com/4289177/87027522-463a0f80-c1ab-11ea-8436-352adc72266b.png)
 
 ### Data Querying
 #### Fetch data from the Pocket server and cache it
@@ -147,50 +191,6 @@ The default location of cache file is `~/pocket-tools.cache`, you can change it 
     >>> get_favorite_count(data)
     {'count': 2, 'percent': 0.1}
 ```
-
-
-### Visualization
-Start the application (webserver) by running the commands below:
-```bash
-    python -m pocket_stats webapp
-
-    # You will see something like this:
-    # Dash is running on http://127.0.0.1:8050/
-```
-
-Other parameters:
-```bash
-    python3 -m pocket_stats webapp --help
-
-    # Usage: __main__.py webapp [OPTIONS]
-    # Options:
-    # --debug         Debug mode
-    # --port INTEGER  Port of the web server. Default = 8050.
-    # --help          Show this message and exit.
-```
-
-Enter http://127.0.0.1:8050/ in your web browser. The site contains multiple components:
-
-#### Word Cloud
-![word_cloud](https://user-images.githubusercontent.com/4289177/87027187-cca22180-c1aa-11ea-89cb-ae1b91493934.png)
-
-#### Article Count timeseries
-![article_count](https://user-images.githubusercontent.com/4289177/87027476-38848a00-c1ab-11ea-9115-925dc0660815.png)
-
-#### Word Count distribution
-Stacked histograms
-![word_count](https://user-images.githubusercontent.com/4289177/87027494-3de1d480-c1ab-11ea-9bfd-ded18cb4025b.png)
-
-#### Reading Speed & Reading Time
-Stacked histograms
-![reading_time](https://user-images.githubusercontent.com/4289177/87027500-3fab9800-c1ab-11ea-8a57-be4cb7eaf168.png)
-
-#### Top Domains
-Stacked bar charts.
-![top_domains](https://user-images.githubusercontent.com/4289177/87027511-420df200-c1ab-11ea-85c9-08f08f546caf.png)
-
-#### Language & Favorite
-![language_favorite](https://user-images.githubusercontent.com/4289177/87027522-463a0f80-c1ab-11ea-8436-352adc72266b.png)
 
 ## Test
 ```bash
