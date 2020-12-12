@@ -43,7 +43,7 @@ A tool to analyze your Pocket reading list (https://app.getpocket.com/).
 ## Installation
 ### Pip
 ```bash
-    pip install pocket-stats
+    pip3 install pocket-stats
 ```
 
 ### Git Clone
@@ -66,10 +66,10 @@ Set necessary environment variables:
 Command line:
 ```bash
     # read only
-    python -m pocket_stats fetch-data --offset 0 --limit 2
+    python3 -m pocket_stats fetch-data --offset 0 --limit 2
 
     # to write ALL the items to cache
-    python -m pocket_stats fetch-data --overwrite_cache
+    python3 -m pocket_stats fetch-data --overwrite_cache
 ```
 
 Or in python code:
@@ -160,7 +160,7 @@ Start the application (webserver) by running the commands below:
 
 Other parameters:
 ```bash
-    python -m pocket_stats webapp --help
+    python3 -m pocket_stats webapp --help
 
     # Usage: __main__.py webapp [OPTIONS]
     # Options:
