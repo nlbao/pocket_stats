@@ -136,7 +136,7 @@ The default location of cache file is `~/pocket-tools.cache`, you can change it 
     Counter({'kalzumeus.com': 3, 'bogleheads.org': 2, 'github.io': 2, 'brendangregg.com': 1, 'martinheinz.dev': 1, 'awealthofcommonsense.com': 1, 'jlcollinsnh.com': 1, 'callan.com': 1, 'engineerseekingfire.com': 1, 'arxiv.org': 1, 'popularmechanics.com': 1, 'dolpages.com': 1, 'economist.com': 1, 'romantomjak.com': 1, 'digitalocean.com': 1, 'deepnote.com': 1})
 ```
 
-- Number of aritlces per language:
+- Number of articles per language:
 ```python
     >>> get_language_counts(data)
     Counter({'en': 17, 'unknown': 3})
