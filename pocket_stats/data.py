@@ -50,7 +50,8 @@ def epoch_to_yyymmdd(epoch: int):
 # ------- Main functions ------- #
 def fetch_data(offset: int = 0, limit: int = None, overwrite_cache: bool = False,
                consumer_key: str = CONSUMER_KEY, access_token: str = ACCESS_TOKEN) -> List[Dict]:
-    assert (consumer_key is not None) and (access_token is not None), 'Please set value for these environment variables'
+    assert (consumer_key is not None) and (access_token is not None), \
+        'Please set value for POCKET_STATS_CONSUMER_KEY and POCKET_STATS_ACCESS_TOKEN environment variables'
     api = Pocket(consumer_key=consumer_key, access_token=access_token)
     ans = []
     count = 500
