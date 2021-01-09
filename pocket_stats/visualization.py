@@ -208,10 +208,16 @@ def favorite_count_plot(data: List[Dict]) -> html.Div:
 
 
 def create_app(data: List[Dict] = None) -> dash.Dash:
-    if data is None:
-        data = load_cache()
     app = dash.Dash()
     app.title = "Pocket Stats"
+
+    if data is None:
+        # data = load_cache()  # TODO: use this and remove the code below
+        app.layout = html.Div(style={}, children=[
+            html.H1("Hello Hooman!"),
+        ])
+        return app
+
     app.layout = html.Div(style={}, children=[
         word_cloud_plot(data),
         articles_over_time_plot(data),
