@@ -65,23 +65,12 @@ A tool to analyze your Pocket reading list (https://app.getpocket.com/).
     python3 -m pocket_stats fetch-data --overwrite_cache
     
     # Start the webserver
-    python3 -m pocket_stats webapp  
+    gunicorn --workers 2 'pocket_stats.app:server' -b :8050
     
     # You will see something like this:
     # Dash is running on http://127.0.0.1:8050/
 ```
 Go to http://127.0.0.1:8050/ from your web browser.
-
-Other parameters:
-```bash
-    python3 -m pocket_stats webapp --help
-
-    # Usage: __main__.py webapp [OPTIONS]
-    # Options:
-    # --debug         Debug mode
-    # --port INTEGER  Port of the web server. Default = 8050.
-    # --help          Show this message and exit.
-```
 
 ### Visualization
 #### Word Cloud

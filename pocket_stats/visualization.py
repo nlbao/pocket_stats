@@ -207,8 +207,8 @@ def favorite_count_plot(data: List[Dict]) -> html.Div:
     )
 
 
-def create_app(data: List[Dict] = None) -> dash.Dash:
-    app = dash.Dash()
+def create_app(data: List[Dict] = None, server=None) -> dash.Dash:
+    app = dash.Dash() if (server is None) else dash.Dash(server=server)
     app.title = "Pocket Stats"
 
     if data is None:
