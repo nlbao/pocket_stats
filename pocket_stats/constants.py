@@ -9,7 +9,7 @@ CONSUMER_KEY = os.environ.get('POCKET_STATS_CONSUMER_KEY', None)
 ACCESS_TOKEN = os.environ.get('POCKET_STATS_ACCESS_TOKEN', None)
 CACHE_FILE = os.environ.get('POCKET_STATS_CACHE_FILE', os.path.expanduser('~/pocket-tools.cache'))
 DEFAULT_READING_SPEED = 225  # words per minute
-
+MAX_LRU_CACHE_SIZE = 128
 
 root = logging.getLogger()
 root.setLevel(logging.INFO)

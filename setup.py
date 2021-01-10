@@ -34,6 +34,7 @@ setup(
         'nltk',
         'tldextract',
         'pandas',
+        'gunicorn',
     ],
     tests_require=['pytest', 'pytest-cov', 'freezegun'],
     zip_safe=False
