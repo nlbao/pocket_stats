@@ -13,6 +13,7 @@ env_variables:
   LC_ALL: "en_US.UTF-8"
   LANG: "en_US.UTF-8"
   POCKET_STATS_CONSUMER_KEY: "%POCKET_STATS_CONSUMER_KEY%" # will be set in cloud_env.sh
+  GTAG_ID: "%GTAG_ID%" # will be set in cloud_env.sh
 
 handlers:
   - url: /.*

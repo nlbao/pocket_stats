@@ -13,7 +13,7 @@ import plotly.express as px
 from data import get_data, count_words_in_title, get_word_counts, get_reading_time, get_average_readed_word
 from data import get_added_time_series, get_archived_time_series
 from data import get_language_counts, get_favorite_count, get_domain_counts
-from constants import DEFAULT_READING_SPEED, ACCESS_TOKEN, MAX_NUMBER_OF_RECORDS
+from constants import DEFAULT_READING_SPEED, ACCESS_TOKEN, MAX_NUMBER_OF_RECORDS, DASH_APP_INDEX_STRING
 
 
 INPUT_SECTION_STYLE = {'width': '100%', 'font-size': '30px'}
@@ -246,6 +246,7 @@ def input_section() -> html.Div:
 
 def create_app(data: List[Dict] = None, server=None) -> dash.Dash:
     app = dash.Dash() if (server is None) else dash.Dash(server=server)
+    app.index_string = DASH_APP_INDEX_STRING
     app.title = "Pocket Stats"
     app.layout = html.Div(style={}, children=[
         input_section(),
