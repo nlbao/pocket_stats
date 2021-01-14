@@ -8,7 +8,7 @@ from collections import Counter
 from nltk.corpus import stopwords
 import pandas as pd
 from functools import lru_cache
-from constants import MAX_LRU_CACHE_SIZE, CONSUMER_KEY, ACCESS_TOKEN, DEFAULT_READING_SPEED, DEFAULT_TZINFO
+from constants import MAX_LRU_CACHE_SIZE, CONSUMER_KEY, ACCESS_TOKEN, DEFAULT_READING_SPEED, DEFAULT_TZINFO, MAX_NUMBER_OF_RECORDS
 
 
 # ------- Helper functions ------- #
@@ -50,6 +50,7 @@ def fetch_data(offset: int = 0, limit: int = None,
                consumer_key: str = CONSUMER_KEY, access_token: str = ACCESS_TOKEN) -> List[Dict]:
     assert (consumer_key is not None) and (access_token is not None), \
         'Please set value for POCKET_STATS_CONSUMER_KEY and POCKET_STATS_ACCESS_TOKEN environment variables'
+    assert 0 < limit and limit <= MAX_NUMBER_OF_RECORDS, limit
     api = Pocket(consumer_key=consumer_key, access_token=access_token)
     ans = []
     count = 500

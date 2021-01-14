@@ -13,7 +13,7 @@ import plotly.express as px
 from data import get_data, count_words_in_title, get_word_counts, get_reading_time, get_average_readed_word
 from data import get_added_time_series, get_archived_time_series
 from data import get_language_counts, get_favorite_count, get_domain_counts
-from constants import DEFAULT_READING_SPEED, ACCESS_TOKEN
+from constants import DEFAULT_READING_SPEED, ACCESS_TOKEN, MAX_NUMBER_OF_RECORDS
 
 
 INPUT_SECTION_STYLE = {'width': '100%', 'font-size': '30px'}
@@ -226,11 +226,10 @@ def input_section() -> html.Div:
             ),
             plot_two_columns(
                 html.Label("Number of records", style=INPUT_SECTION_STYLE),
-                dcc.Input(
+                dcc.Slider(
                     id='input_pocket_number_of_records',
-                    type='number', min=1, max=2048,
-                    placeholder='Enter the number of records to be fetched',
-                    style=INPUT_SECTION_STYLE,
+                    marks={i: str(i) for i in range(0, MAX_NUMBER_OF_RECORDS+1, 250)},
+                    min=1, max=MAX_NUMBER_OF_RECORDS, step=250, value=250,
                 ),
                 width0_percent=20,
             ),
@@ -285,7 +284,7 @@ def create_app(data: List[Dict] = None, server=None) -> dash.Dash:
             return [None] * 8
         data = get_data(
             access_token=input_pocket_access_token,
-            limit=int(input_pocket_number_of_records)
+            limit=input_pocket_number_of_records,
         )
         return [
             [f"Fetched {len(data)} records"],
@@ -314,7 +313,7 @@ def create_app(data: List[Dict] = None, server=None) -> dash.Dash:
     ) -> Tuple[go.Figure, str]:
         data = get_data(
             access_token=input_pocket_access_token,
-            limit=int(input_pocket_number_of_records)
+            limit=input_pocket_number_of_records,
         )
         return [get_reading_time_chart(data, reading_speed),
                 get_reading_time_needed(data, reading_speed, reading_minutes_daily)]
