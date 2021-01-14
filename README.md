@@ -6,26 +6,22 @@
 
 # Pocket Stats
 
-A tool to analyze your Pocket reading list (https://app.getpocket.com/).
+A tool to analyze your [Pocket](https://app.getpocket.com/) reading list.
+
+Deployed at https://pocket-stats.nlbao.page .
 
 - [Pocket Stats](#pocket-stats)
-  - [Prerequisites](#prerequisites)
+  - [Features](#features)
+    - [Word Cloud](#word-cloud)
+    - [Article Count timeseries](#article-count-timeseries)
+    - [Word Count distribution](#word-count-distribution)
+    - [Reading Speed & Reading Time](#reading-speed--reading-time)
+    - [Top Domains](#top-domains)
+    - [Language & Favorite](#language--favorite)
   - [Installation](#installation)
-    - [Pip](#pip)
-    - [Git Clone](#git-clone)
-  - [Usage](#usage)
-    - [Visualization](#visualization)
-      - [Word Cloud](#word-cloud)
-      - [Article Count timeseries](#article-count-timeseries)
-      - [Word Count distribution](#word-count-distribution)
-      - [Reading Speed & Reading Time](#reading-speed--reading-time)
-      - [Top Domains](#top-domains)
-      - [Language & Favorite](#language--favorite)
-    - [Data Querying](#data-querying)
-      - [Fetch data from the Pocket server and cache it](#fetch-data-from-the-pocket-server-and-cache-it)
-      - [Load cached data](#load-cached-data)
-      - [Extract useful information](#extract-useful-information)
-  - [Test](#test)
+  - [Run web app locally](#run-web-app-locally)
+  - [Data querying](#data-querying)
+  - [Testing](#testing)
   - [Deployment](#deployment)
   - [Contribute](#contribute)
   - [Authors](#authors)
@@ -33,20 +29,43 @@ A tool to analyze your Pocket reading list (https://app.getpocket.com/).
   - [Acknowledgments](#acknowledgments)
 
 
-## Prerequisites
+## Features
+### Word Cloud
+![word_cloud](https://user-images.githubusercontent.com/4289177/87027187-cca22180-c1aa-11ea-89cb-ae1b91493934.png)
+
+### Article Count timeseries
+![article_count](https://user-images.githubusercontent.com/4289177/87027476-38848a00-c1ab-11ea-9115-925dc0660815.png)
+
+### Word Count distribution
+Stacked histograms
+![word_count](https://user-images.githubusercontent.com/4289177/87027494-3de1d480-c1ab-11ea-9bfd-ded18cb4025b.png)
+
+### Reading Speed & Reading Time
+Stacked histograms
+![reading_time](https://user-images.githubusercontent.com/4289177/87027500-3fab9800-c1ab-11ea-8a57-be4cb7eaf168.png)
+
+### Top Domains
+Stacked bar charts.
+![top_domains](https://user-images.githubusercontent.com/4289177/87027511-420df200-c1ab-11ea-85c9-08f08f546caf.png)
+
+### Language & Favorite
+![language_favorite](https://user-images.githubusercontent.com/4289177/87027522-463a0f80-c1ab-11ea-8436-352adc72266b.png)
+
+
+## Installation
+
+Prerequisites:
 * A [Pocket](https://app.getpocket.com/) account.
 * Pocket [consumer key](https://getpocket.com/developer/apps/new).
 * Pocket access token. You can use [fxneumann's OneClickPocket tool](http://reader.fxneumann.de/plugins/oneclickpocket/auth.php) to automate this.
 * Python 3.6+.
 
-
-## Installation
-### Pip
+You can install using Pip:
 ```bash
     pip3 install pocket-stats
 ```
 
-### Git Clone
+Or clone this repo:
 ```bash
     git clone https://github.com/nlbao/pocket_stats.git
     cd pocket_stats
@@ -54,7 +73,7 @@ A tool to analyze your Pocket reading list (https://app.getpocket.com/).
 ```
 
 
-## Usage
+## Run web app locally
 
 ```bash
     # Set necessary environment variables:
@@ -69,58 +88,9 @@ A tool to analyze your Pocket reading list (https://app.getpocket.com/).
 ```
 Go to http://127.0.0.1:8050/ from your web browser.
 
-### Visualization
-#### Word Cloud
-![word_cloud](https://user-images.githubusercontent.com/4289177/87027187-cca22180-c1aa-11ea-89cb-ae1b91493934.png)
 
-#### Article Count timeseries
-![article_count](https://user-images.githubusercontent.com/4289177/87027476-38848a00-c1ab-11ea-9115-925dc0660815.png)
+## Data querying
 
-#### Word Count distribution
-Stacked histograms
-![word_count](https://user-images.githubusercontent.com/4289177/87027494-3de1d480-c1ab-11ea-9bfd-ded18cb4025b.png)
-
-#### Reading Speed & Reading Time
-Stacked histograms
-![reading_time](https://user-images.githubusercontent.com/4289177/87027500-3fab9800-c1ab-11ea-8a57-be4cb7eaf168.png)
-
-#### Top Domains
-Stacked bar charts.
-![top_domains](https://user-images.githubusercontent.com/4289177/87027511-420df200-c1ab-11ea-85c9-08f08f546caf.png)
-
-#### Language & Favorite
-![language_favorite](https://user-images.githubusercontent.com/4289177/87027522-463a0f80-c1ab-11ea-8436-352adc72266b.png)
-
-### Data Querying
-#### Fetch data from the Pocket server and cache it
-Command line:
-```bash
-    # read only
-    python3 -m pocket_stats fetch-data --offset 0 --limit 2
-
-    # to write ALL the items to cache
-    python3 -m pocket_stats fetch-data --overwrite_cache
-```
-
-Or in python code:
-```python
-    from pocket_stats.data import fetch_data
-
-    # fetch the first 100 items, won't overwrite cache
-    data = fetch_data(offset=0, limit=100, overwrite_cache=False)
-
-    # fetch ALL items, will overwrite cache
-    data = fetch_data(overwrite_cache=True)
-```
-The default location of cache file is `~/pocket-tools.cache`, you can change it using the `POCKET_STATS_CACHE_FILE` environment variable.
-
-#### Load cached data
-```python
-    from pocket_stats.data import load_cache
-    data = load_cache()
-```
-
-#### Extract useful information
 ``` python
     from pocket_stats.data import <your_function_names>
 ```
@@ -178,7 +148,7 @@ The default location of cache file is `~/pocket-tools.cache`, you can change it 
     {'count': 2, 'percent': 0.1}
 ```
 
-## Test
+## Testing
 ```bash
     make check
 ```
