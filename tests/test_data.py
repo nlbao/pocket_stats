@@ -9,7 +9,7 @@ from freezegun import freeze_time
 from pocket_stats.data import fetch_data, load_cache, is_valid_word, normalize_language_name, get_domain_from_url
 from pocket_stats.data import should_pass_filters, count_words_in_title, get_word_counts, get_favorite_count
 from pocket_stats.data import get_reading_time, get_added_time_series, get_archived_time_series
-from pocket_stats.data import get_average_readed_word, get_domain_counts, get_language_counts, download_ntlk
+from pocket_stats.data import get_average_readed_word, get_domain_counts, get_language_counts
 from pocket_stats.data import get_unread_count
 
 
@@ -70,13 +70,6 @@ def test_fetch_data_failed():
 
 def raise_lookup_err_side_effect(*args, **kwargs):
     raise LookupError
-
-
-@patch('nltk.download')
-@patch('nltk.data.find')
-def test_download_ntlk(mocked_nltk_data_find, mocked_ntlk_download):
-    mocked_nltk_data_find.side_effect = raise_lookup_err_side_effect
-    download_ntlk()
 
 
 def test_is_valid_word():

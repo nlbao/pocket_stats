@@ -15,6 +15,7 @@ clean-test:
 clean: clean-pyc clean-test
 
 test: clean
+	python3 -c "import nltk ; nltk.download('stopwords')"
 	pytest tests --cov=pocket_stats --cov-report=term-missing
 
 lint:

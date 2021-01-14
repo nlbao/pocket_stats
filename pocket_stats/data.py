@@ -1,4 +1,3 @@
-import nltk
 import errno
 import os
 import json
