@@ -9,7 +9,6 @@ DEFAULT_TZINFO = pytz.utc
 CONSUMER_KEY = os.environ.get('POCKET_STATS_CONSUMER_KEY', None)
 ACCESS_TOKEN = os.environ.get('POCKET_STATS_ACCESS_TOKEN', None)
 GTAG_ID = os.environ.get('GTAG_ID', '')
-CACHE_FILE = os.environ.get('POCKET_STATS_CACHE_FILE', os.path.expanduser('~/pocket-tools.cache'))  # TODO: remove this
 DEFAULT_READING_SPEED = 225  # words per minute
 MAX_LRU_CACHE_SIZE = 128
 MAX_NUMBER_OF_RECORDS = 1000

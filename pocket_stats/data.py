@@ -1,4 +1,7 @@
 import nltk
+import errno
+import os
+import json
 import logging
 import tldextract
 from datetime import datetime, timedelta
@@ -46,6 +49,17 @@ def epoch_to_yyymmdd(epoch: int):
 
 
 # ------- Main functions ------- #
+
+# this is used for testing only
+def load_cache(cache_file: str) -> List[Dict]:
+    if not os.path.isfile(cache_file):
+        logging.error("Missing cache file, please run 'python -m pocket_stats fetch-data --overwrite_cache'")
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT),
+                                cache_file)
+    with open(cache_file, 'r') as fi:
+        return json.load(fi)
+
+
 def fetch_data(offset: int = 0, limit: int = None,
                consumer_key: str = CONSUMER_KEY, access_token: str = ACCESS_TOKEN) -> List[Dict]:
     assert (consumer_key is not None) and (access_token is not None), \
