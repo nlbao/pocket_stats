@@ -1,4 +1,9 @@
 steps:
+  - name: "ubuntu"
+    args: ["bash", "./cloud_env.sh"]
+    env:
+      - "POCKET_STATS_CONSUMER_KEY=${_POCKET_STATS_CONSUMER_KEY}" # Substitution from GCP build trigger
+
   - name: "gcr.io/cloud-builders/gcloud"
     args:
       - "app"

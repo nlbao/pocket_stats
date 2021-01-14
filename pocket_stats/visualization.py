@@ -13,7 +13,7 @@ import plotly.express as px
 from data import get_data, count_words_in_title, get_word_counts, get_reading_time, get_average_readed_word
 from data import get_added_time_series, get_archived_time_series
 from data import get_language_counts, get_favorite_count, get_domain_counts
-from constants import DEFAULT_READING_SPEED, CONSUMER_KEY, ACCESS_TOKEN
+from constants import DEFAULT_READING_SPEED, ACCESS_TOKEN
 
 
 INPUT_SECTION_STYLE = {'width': '100%', 'font-size': '30px'}
@@ -215,16 +215,6 @@ def input_section() -> html.Div:
     return html.Div([
         html.Div([
             plot_two_columns(
-                html.Label("Pocket Consumer Key", style=INPUT_SECTION_STYLE),
-                dcc.Input(
-                    id='input_pocket_consumer_key',
-                    placeholder='Enter your Pocket Consumer Key',
-                    value=CONSUMER_KEY if CONSUMER_KEY else '',
-                    style=INPUT_SECTION_STYLE,
-                ),
-                width0_percent=20,
-            ),
-            plot_two_columns(
                 html.Label("Pocket Access Token", style=INPUT_SECTION_STYLE),
                 dcc.Input(
                     id='input_pocket_access_token',
@@ -283,20 +273,17 @@ def create_app(data: List[Dict] = None, server=None) -> dash.Dash:
         Output('language_counts_div', 'children'),
         Output('favorite_counts_div', 'children'),
         Input(component_id='input_reload_button', component_property='n_clicks'),
-        State(component_id='input_pocket_consumer_key', component_property='value'),
         State(component_id='input_pocket_access_token', component_property='value'),
         State(component_id='input_pocket_number_of_records', component_property='value'),
     )
     def update_data(
         n_clicks: int,
-        input_pocket_consumer_key: str,
         input_pocket_access_token: str,
         input_pocket_number_of_records: str,  # need to convert it to int
     ) -> Tuple[Any, Any, Any, Any, Any, Any, Any, Any]:
         if n_clicks == 0:
             return [None] * 8
         data = get_data(
-            consumer_key=input_pocket_consumer_key,
             access_token=input_pocket_access_token,
             limit=int(input_pocket_number_of_records)
         )
@@ -316,19 +303,16 @@ def create_app(data: List[Dict] = None, server=None) -> dash.Dash:
         Output(component_id='reading-time-needed', component_property='children'),
         Input(component_id='reading-speed', component_property='value'),
         Input(component_id='reading-minutes-daily', component_property='value'),
-        State(component_id='input_pocket_consumer_key', component_property='value'),
         State(component_id='input_pocket_access_token', component_property='value'),
         State(component_id='input_pocket_number_of_records', component_property='value'),
     )
     def update_reading_time_components(
         reading_speed: int,
         reading_minutes_daily: int,
-        input_pocket_consumer_key: str,
         input_pocket_access_token: str,
         input_pocket_number_of_records: str,  # need to convert it to int
     ) -> Tuple[go.Figure, str]:
         data = get_data(
-            consumer_key=input_pocket_consumer_key,
             access_token=input_pocket_access_token,
             limit=int(input_pocket_number_of_records)
         )

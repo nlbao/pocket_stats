@@ -1,0 +1,7 @@
+printenv > .env
+
+echo "POCKET_STATS_CONSUMER_KEY = $POCKET_STATS_CONSUMER_KEY"
+
+sed -i 's/%POCKET_STATS_CONSUMER_KEY%/'$POCKET_STATS_CONSUMER_KEY'/g' app.yaml
+
+cat app.yaml

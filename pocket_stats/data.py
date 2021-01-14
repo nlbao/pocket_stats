@@ -72,11 +72,10 @@ def fetch_data(offset: int = 0, limit: int = None,
 
 
 @lru_cache(maxsize=MAX_LRU_CACHE_SIZE)
-def get_data(consumer_key: str, access_token: str, limit: int = None) -> List[Dict]:
+def get_data(access_token: str, limit: int = None) -> List[Dict]:
     # TODO: load from Memcache or DB
     return fetch_data(
         limit=limit,
-        consumer_key=consumer_key,
         access_token=access_token,
     )
 

@@ -12,6 +12,7 @@ env_variables:
   # https://click.palletsprojects.com/en/7.x/python3/
   LC_ALL: "en_US.UTF-8"
   LANG: "en_US.UTF-8"
+  POCKET_STATS_CONSUMER_KEY: "%POCKET_STATS_CONSUMER_KEY%" # will be set in cloud_env.sh
 
 handlers:
   - url: /.*
