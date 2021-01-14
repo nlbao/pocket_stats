@@ -287,7 +287,7 @@ def create_app(data: List[Dict] = None, server=None) -> dash.Dash:
             access_token=input_pocket_access_token,
             limit=input_pocket_number_of_records,
         )
-        return [
+        return (
             [f"Fetched {len(data)} records"],
             word_cloud_plot(data),
             articles_over_time_plot(data),
@@ -296,7 +296,7 @@ def create_app(data: List[Dict] = None, server=None) -> dash.Dash:
             domain_counts_plot(data),
             language_counts_plot(data),
             favorite_count_plot(data),
-        ]
+        )
 
     @app.callback(
         Output(component_id='reading-time-chart', component_property='figure'),
@@ -316,7 +316,7 @@ def create_app(data: List[Dict] = None, server=None) -> dash.Dash:
             access_token=input_pocket_access_token,
             limit=input_pocket_number_of_records,
         )
-        return [get_reading_time_chart(data, reading_speed),
-                get_reading_time_needed(data, reading_speed, reading_minutes_daily)]
+        return (get_reading_time_chart(data, reading_speed),
+                get_reading_time_needed(data, reading_speed, reading_minutes_daily))
 
     return app

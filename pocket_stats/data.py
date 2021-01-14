@@ -11,7 +11,9 @@ from collections import Counter
 from nltk.corpus import stopwords
 import pandas as pd
 from functools import lru_cache
-from constants import MAX_LRU_CACHE_SIZE, CONSUMER_KEY, ACCESS_TOKEN, DEFAULT_READING_SPEED, DEFAULT_TZINFO, MAX_NUMBER_OF_RECORDS
+from constants import CONSUMER_KEY, ACCESS_TOKEN
+from constants import DEFAULT_TZINFO, DEFAULT_READING_SPEED
+from constants import MAX_LRU_CACHE_SIZE, MAX_NUMBER_OF_RECORDS
 
 
 # ------- Helper functions ------- #
