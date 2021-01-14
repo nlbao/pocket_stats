@@ -59,9 +59,8 @@ def test_load_cache(data: List[Dict]):
 @patch('pocket_stats.data.open')
 @patch('pocket.Pocket.retrieve')
 def test_fetch_data_ok(mocked_pocket_retrieve, mocked_open, mocked_json_dump):
-    fetch_data(consumer_key='invalid', access_token='none')  # empty data returned from api
     mocked_pocket_retrieve.return_value = {'list': {1: 2, 2: 3}}
-    fetch_data(offset=10, limit=100, consumer_key='invalid', access_token='none', overwrite_cache=True)
+    fetch_data(offset=10, limit=100, consumer_key='invalid', access_token='none')
 
 
 def test_fetch_data_failed():

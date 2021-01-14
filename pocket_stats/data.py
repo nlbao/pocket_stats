@@ -10,7 +10,10 @@ from typing import List, Dict
 from collections import Counter
 from nltk.corpus import stopwords
 import pandas as pd
-from constants import CACHE_FILE, CONSUMER_KEY, ACCESS_TOKEN, DEFAULT_READING_SPEED, DEFAULT_TZINFO
+from functools import lru_cache
+from constants import CONSUMER_KEY, ACCESS_TOKEN
+from constants import DEFAULT_TZINFO, DEFAULT_READING_SPEED
+from constants import MAX_LRU_CACHE_SIZE, MAX_NUMBER_OF_RECORDS
 
 
 # ------- Helper functions ------- #
@@ -48,9 +51,22 @@ def epoch_to_yyymmdd(epoch: int):
 
 
 # ------- Main functions ------- #
-def fetch_data(offset: int = 0, limit: int = None, overwrite_cache: bool = False,
+
+# this is used for testing only
+def load_cache(cache_file: str) -> List[Dict]:
+    if not os.path.isfile(cache_file):
+        logging.error("Missing cache file, please run 'python -m pocket_stats fetch-data --overwrite_cache'")
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT),
+                                cache_file)
+    with open(cache_file, 'r') as fi:
+        return json.load(fi)
+
+
+def fetch_data(offset: int = 0, limit: int = None,
                consumer_key: str = CONSUMER_KEY, access_token: str = ACCESS_TOKEN) -> List[Dict]:
-    assert (consumer_key is not None) and (access_token is not None), 'Please set value for these environment variables'
+    assert (consumer_key is not None) and (access_token is not None), \
+        'Please set value for POCKET_STATS_CONSUMER_KEY and POCKET_STATS_ACCESS_TOKEN environment variables'
+    assert 0 < limit and limit <= MAX_NUMBER_OF_RECORDS, limit
     api = Pocket(consumer_key=consumer_key, access_token=access_token)
     ans = []
     count = 500
@@ -69,20 +85,16 @@ def fetch_data(offset: int = 0, limit: int = None, overwrite_cache: bool = False
         ans.extend(item for k, item in items.items())
         logging.info(f'Fetched {n} records. Total = {len(ans)} now.')
         offset += n
-    if overwrite_cache:
-        logging.info(f'Writing data to cache file {CACHE_FILE}')
-        with open(CACHE_FILE, 'w') as fo:
-            json.dump(ans, fo)
     return ans
 
 
-def load_cache(cache_file: str = CACHE_FILE) -> List[Dict]:
-    if not os.path.isfile(cache_file):
-        logging.error("Missing cache file, please run 'python -m pocket_stats fetch-data --overwrite_cache'")
-        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT),
-                                cache_file)
-    with open(cache_file, 'r') as fi:
-        return json.load(fi)
+@lru_cache(maxsize=MAX_LRU_CACHE_SIZE)
+def get_data(access_token: str, limit: int = None) -> List[Dict]:
+    # TODO: load from Memcache or DB
+    return fetch_data(
+        limit=limit,
+        access_token=access_token,
+    )
 
 
 # filter format: [key, operation, expected_value]
@@ -132,7 +144,8 @@ def get_added_time_series(data: List[Dict]) -> pd.DataFrame:
     added_date_counts = Counter(epoch_to_yyymmdd(record['time_added']) for record in data)
     df = pd.DataFrame.from_dict({datetime.strptime(d, '%Y%m%d'): cnt for d, cnt in added_date_counts.items()},
                                 orient='index', columns=['All articles'])
-    df.index = df.index.tz_localize('UTC')
+    if len(df) > 0:
+        df.index = df.index.tz_localize('UTC')
     return df
 
 
@@ -143,7 +156,8 @@ def get_archived_time_series(data: List[Dict]) -> pd.DataFrame:
     )
     df = pd.DataFrame.from_dict({datetime.strptime(d, '%Y%m%d'): cnt for d, cnt in archived_date_counts.items()},
                                 orient='index', columns=['Archived articles'])
-    df.index = df.index.tz_localize('UTC')
+    if len(df) > 0:
+        df.index = df.index.tz_localize('UTC')
     return df
 
 

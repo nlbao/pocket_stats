@@ -14,10 +14,6 @@ A tool to analyze your Pocket reading list (https://app.getpocket.com/).
     - [Pip](#pip)
     - [Git Clone](#git-clone)
   - [Usage](#usage)
-    - [Data Querying](#data-querying)
-      - [Fetch data from the Pocket server and cache it](#fetch-data-from-the-pocket-server-and-cache-it)
-      - [Load cached data](#load-cached-data)
-      - [Extract useful information](#extract-useful-information)
     - [Visualization](#visualization)
       - [Word Cloud](#word-cloud)
       - [Article Count timeseries](#article-count-timeseries)
@@ -25,6 +21,10 @@ A tool to analyze your Pocket reading list (https://app.getpocket.com/).
       - [Reading Speed & Reading Time](#reading-speed--reading-time)
       - [Top Domains](#top-domains)
       - [Language & Favorite](#language--favorite)
+    - [Data Querying](#data-querying)
+      - [Fetch data from the Pocket server and cache it](#fetch-data-from-the-pocket-server-and-cache-it)
+      - [Load cached data](#load-cached-data)
+      - [Extract useful information](#extract-useful-information)
   - [Test](#test)
   - [Deployment](#deployment)
   - [Contribute](#contribute)
@@ -60,28 +60,14 @@ A tool to analyze your Pocket reading list (https://app.getpocket.com/).
     # Set necessary environment variables:
     export POCKET_STATS_CONSUMER_KEY='<your_pocket_consumer_key>'
     export POCKET_STATS_ACCESS_TOKEN='<your_pocket_access_token>'
-    
-    # run this command only at the first time, or when you need to update the data
-    python3 -m pocket_stats fetch-data --overwrite_cache
-    
+       
     # Start the webserver
-    python -m pocket_stats webapp  
+    gunicorn --workers 2 'pocket_stats.app:server' -b :8050 --reload
     
     # You will see something like this:
     # Dash is running on http://127.0.0.1:8050/
 ```
 Go to http://127.0.0.1:8050/ from your web browser.
-
-Other parameters:
-```bash
-    python3 -m pocket_stats webapp --help
-
-    # Usage: __main__.py webapp [OPTIONS]
-    # Options:
-    # --debug         Debug mode
-    # --port INTEGER  Port of the web server. Default = 8050.
-    # --help          Show this message and exit.
-```
 
 ### Visualization
 #### Word Cloud

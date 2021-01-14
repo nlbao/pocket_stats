@@ -6,24 +6,29 @@ import dash
 import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
 import plotly.express as px
 
-from data import load_cache, count_words_in_title, get_word_counts, get_reading_time, get_average_readed_word
+from data import get_data, count_words_in_title, get_word_counts, get_reading_time, get_average_readed_word
 from data import get_added_time_series, get_archived_time_series
 from data import get_language_counts, get_favorite_count, get_domain_counts
-from constants import DEFAULT_READING_SPEED
+from constants import DEFAULT_READING_SPEED, ACCESS_TOKEN, MAX_NUMBER_OF_RECORDS, DASH_APP_INDEX_STRING
 
 
-def plot_two_columns(col0: Any, col1: Any) -> html.Div:
+INPUT_SECTION_STYLE = {'width': '100%', 'font-size': '30px'}
+
+
+def plot_two_columns(col0: Any, col1: Any, width0_percent: float = 50) -> html.Div:
+    assert 0 <= width0_percent and width0_percent <= 100, width0_percent
+    width1_percent = 100 - width0_percent
     return html.Div(className='row', children=[
-        html.Div([col0], className='two-columns--0'),
-        html.Div([col1], className='two-columns--1'),
+        html.Div([col0], className='two-columns--0', style={'width': f'{width0_percent}%'}),
+        html.Div([col1], className='two-columns--1', style={'width': f'{width1_percent}%'}),
     ])
 
 
-def word_cloud_plot(data: List[Dict]) -> html.Div:
+def word_cloud_plot(data: List[Dict]) -> dcc.Graph:
     word_cnts = count_words_in_title(data)
     n_word = len(word_cnts)
     words = list(word_cnts.keys())
@@ -39,9 +44,7 @@ def word_cloud_plot(data: List[Dict]) -> html.Div:
     layout = go.Layout({'xaxis': {'showgrid': False, 'showticklabels': False, 'zeroline': False},
                         'yaxis': {'showgrid': False, 'showticklabels': False, 'zeroline': False}})
     fig = go.Figure(data=[data], layout=layout)
-    return html.Div([
-        dcc.Graph(id='word-cloud', figure=fig)
-    ])
+    return dcc.Graph(figure=fig)
 
 
 def articles_over_time_plot(data: List[Dict], should_cumsum: bool = True) -> dcc.Graph:
@@ -55,7 +58,7 @@ def articles_over_time_plot(data: List[Dict], should_cumsum: bool = True) -> dcc
     fig = px.line(df,
                   labels={'index': 'Date', 'value': 'Number of articles'},
                   title='Article Count Over Time')
-    return dcc.Graph(id='time_series', figure=fig)
+    return dcc.Graph(figure=fig)
 
 
 def word_counts_plot(data: List[Dict]) -> dcc.Graph:
@@ -85,7 +88,7 @@ def word_counts_plot(data: List[Dict]) -> dcc.Graph:
     return html.Div([
         html.H3(children='Average readed words recently (words / day)', className='center-text'),
         avg_readed_words_table,
-        dcc.Graph(id='word-count', figure=fig)
+        dcc.Graph(figure=fig)
     ])
 
 
@@ -145,7 +148,8 @@ def reading_time_plot(data: List[Dict]) -> html.Div:
             min=10, max=max_reading_minutes_daily, step=10, value=60,
         ),
         html.Div(id='reading-time-needed', children=''),
-        dcc.Graph(id='reading-time', figure=go.Figure()),  # figure will be updated by update_reading_time_components()
+        # figure will be updated by update_reading_time_components()
+        dcc.Graph(id='reading-time-chart', figure=go.Figure()),
     ])
 
 
@@ -176,7 +180,7 @@ def domain_counts_plot(data: List[Dict], limit: int = 20) -> dcc.Graph:
         barmode='stack',
         yaxis=dict(tickmode='linear'),  # to show ALL labels
     )
-    return dcc.Graph(id='domain-counts', figure=fig)
+    return dcc.Graph(figure=fig)
 
 
 def language_counts_plot(data: List[Dict]) -> dcc.Graph:
@@ -190,7 +194,7 @@ def language_counts_plot(data: List[Dict]) -> dcc.Graph:
         ],
         layout_title_text="Languages",
     )
-    return dcc.Graph(id='language-counts', figure=fig)
+    return dcc.Graph(figure=fig)
 
 
 def favorite_count_plot(data: List[Dict]) -> html.Div:
@@ -207,26 +211,111 @@ def favorite_count_plot(data: List[Dict]) -> html.Div:
     )
 
 
-def create_app(data: List[Dict] = None) -> dash.Dash:
-    if data is None:
-        data = load_cache()
-    app = dash.Dash()
+def input_section() -> html.Div:
+    return html.Div([
+        html.Div([
+            plot_two_columns(
+                html.Label("Pocket Access Token", style=INPUT_SECTION_STYLE),
+                dcc.Input(
+                    id='input_pocket_access_token',
+                    placeholder='Enter your Pocket Access Token',
+                    value=ACCESS_TOKEN if ACCESS_TOKEN else '',
+                    style=INPUT_SECTION_STYLE,
+                ),
+                width0_percent=20,
+            ),
+            plot_two_columns(
+                html.Label("Number of records", style=INPUT_SECTION_STYLE),
+                dcc.Slider(
+                    id='input_pocket_number_of_records',
+                    marks={i: str(i) for i in range(0, MAX_NUMBER_OF_RECORDS+1, 250)},
+                    min=1, max=MAX_NUMBER_OF_RECORDS, step=250, value=250,
+                ),
+                width0_percent=20,
+            ),
+            plot_two_columns(
+                html.Button('Reload', id='input_reload_button', n_clicks=0,
+                            style={'font-size': '30px', 'background-color': 'coral'}),
+                html.Div(id="number_of_records",
+                         style={'font-size': '30px', 'color': 'blue'}),
+                width0_percent=20,
+            )
+        ]),
+    ])
+
+
+def create_app(data: List[Dict] = None, server=None) -> dash.Dash:
+    app = dash.Dash() if (server is None) else dash.Dash(server=server)
+    app.index_string = DASH_APP_INDEX_STRING
     app.title = "Pocket Stats"
     app.layout = html.Div(style={}, children=[
-        word_cloud_plot(data),
-        articles_over_time_plot(data),
-        plot_two_columns(word_counts_plot(data), reading_time_plot(data)),
-        domain_counts_plot(data),
-        plot_two_columns(language_counts_plot(data), favorite_count_plot(data)),
+        input_section(),
+        html.Div(id='word_cloud_div', children=[]),
+        html.Div(id='articles_over_time_div', children=[]),
+        plot_two_columns(
+            html.Div(id='word_counts_div', children=[]),
+            html.Div(id='reading_time_div', children=[]),
+        ),
+        html.Div(id='domain_counts_div', children=[]),
+        plot_two_columns(
+            html.Div(id='language_counts_div', children=[]),
+            html.Div(id='favorite_counts_div', children=[]),
+        ),
     ])
 
     @app.callback(
-        [Output(component_id='reading-time', component_property='figure'),
-         Output(component_id='reading-time-needed', component_property='children')],
-        [Input(component_id='reading-speed', component_property='value'),
-         Input(component_id='reading-minutes-daily', component_property='value')]
+        Output('number_of_records', 'children'),
+        Output('word_cloud_div', 'children'),
+        Output('articles_over_time_div', 'children'),
+        Output('word_counts_div', 'children'),
+        Output('reading_time_div', 'children'),
+        Output('domain_counts_div', 'children'),
+        Output('language_counts_div', 'children'),
+        Output('favorite_counts_div', 'children'),
+        Input(component_id='input_reload_button', component_property='n_clicks'),
+        State(component_id='input_pocket_access_token', component_property='value'),
+        State(component_id='input_pocket_number_of_records', component_property='value'),
     )
-    def update_reading_time_components(reading_speed: int, reading_minutes_daily: int) -> Tuple[go.Figure, str]:
+    def update_data(
+        n_clicks: int,
+        input_pocket_access_token: str,
+        input_pocket_number_of_records: str,  # need to convert it to int
+    ) -> Tuple[Any, Any, Any, Any, Any, Any, Any, Any]:
+        if n_clicks == 0:
+            return [None] * 8
+        data = get_data(
+            access_token=input_pocket_access_token,
+            limit=input_pocket_number_of_records,
+        )
+        return (
+            [f"Fetched {len(data)} records"],
+            word_cloud_plot(data),
+            articles_over_time_plot(data),
+            word_counts_plot(data),
+            reading_time_plot(data),
+            domain_counts_plot(data),
+            language_counts_plot(data),
+            favorite_count_plot(data),
+        )
+
+    @app.callback(
+        Output(component_id='reading-time-chart', component_property='figure'),
+        Output(component_id='reading-time-needed', component_property='children'),
+        Input(component_id='reading-speed', component_property='value'),
+        Input(component_id='reading-minutes-daily', component_property='value'),
+        State(component_id='input_pocket_access_token', component_property='value'),
+        State(component_id='input_pocket_number_of_records', component_property='value'),
+    )
+    def update_reading_time_components(
+        reading_speed: int,
+        reading_minutes_daily: int,
+        input_pocket_access_token: str,
+        input_pocket_number_of_records: str,  # need to convert it to int
+    ) -> Tuple[go.Figure, str]:
+        data = get_data(
+            access_token=input_pocket_access_token,
+            limit=input_pocket_number_of_records,
+        )
         return (get_reading_time_chart(data, reading_speed),
                 get_reading_time_needed(data, reading_speed, reading_minutes_daily))
 

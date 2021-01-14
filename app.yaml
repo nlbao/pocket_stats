@@ -1,0 +1,22 @@
+# # Google App Engine config file
+# ref: https://cloud.google.com/appengine/docs/standard/python3/config/appref
+
+runtime: python37 # or another supported version
+
+# GAE will set $PORT
+entrypoint: gunicorn --workers 4 'pocket_stats.app:server' -b :$PORT
+
+instance_class: F2
+
+env_variables:
+  # https://click.palletsprojects.com/en/7.x/python3/
+  LC_ALL: "en_US.UTF-8"
+  LANG: "en_US.UTF-8"
+  POCKET_STATS_CONSUMER_KEY: "%POCKET_STATS_CONSUMER_KEY%" # will be set in cloud_env.sh
+  GTAG_ID: "%GTAG_ID%" # will be set in cloud_env.sh
+
+handlers:
+  - url: /.*
+    secure: always
+    redirect_http_response_code: 301
+    script: auto

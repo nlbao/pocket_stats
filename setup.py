@@ -13,7 +13,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='pocket_stats',
-    version='0.2.2',
+    version='0.3.0',
     description='Tools for the Pocket reading app https://app.getpocket.com/',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -34,6 +34,8 @@ setup(
         'nltk',
         'tldextract',
         'pandas',
+        'gunicorn',
+        'flask-wtf',
     ],
     tests_require=['pytest', 'pytest-cov', 'freezegun'],
     zip_safe=False
