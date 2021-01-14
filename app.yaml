@@ -4,7 +4,7 @@
 runtime: python37 # or another supported version
 
 # GAE will set $PORT
-entrypoint: gunicorn --workers 4 'pocket_stats.app:server' -b :$PORT
+entrypoint: ./run.sh
 
 instance_class: F2
 
