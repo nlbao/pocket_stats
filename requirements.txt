@@ -12,6 +12,7 @@ dash-renderer==1.8.2
 dash-table==4.10.1
 Flask==1.1.2
 Flask-Compress==1.5.0
+flask-wtf==0.14.3
 freezegun
 future==0.18.2
 idna==2.10

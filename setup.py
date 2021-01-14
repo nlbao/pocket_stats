@@ -35,6 +35,7 @@ setup(
         'tldextract',
         'pandas',
         'gunicorn',
+        'flask-wtf',
     ],
     tests_require=['pytest', 'pytest-cov', 'freezegun'],
     zip_safe=False
