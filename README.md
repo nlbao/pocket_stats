@@ -60,10 +60,7 @@ A tool to analyze your Pocket reading list (https://app.getpocket.com/).
     # Set necessary environment variables:
     export POCKET_STATS_CONSUMER_KEY='<your_pocket_consumer_key>'
     export POCKET_STATS_ACCESS_TOKEN='<your_pocket_access_token>'
-    
-    # run this command only at the first time, or when you need to update the data
-    python3 -m pocket_stats fetch-data --overwrite_cache
-    
+       
     # Start the webserver
     gunicorn --workers 2 'pocket_stats.app:server' -b :8050 --reload
     
