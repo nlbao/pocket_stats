@@ -1,4 +1,3 @@
-import nltk
 import errno
 import os
 import json
@@ -16,15 +15,6 @@ from constants import DEFAULT_TZINFO, DEFAULT_READING_SPEED
 from constants import MAX_LRU_CACHE_SIZE, MAX_NUMBER_OF_RECORDS
 
 
-# ------- Helper functions ------- #
-def download_ntlk():
-    try:
-        nltk.data.find('corpora/stopwords')
-    except LookupError:
-        nltk.download('stopwords')
-
-
-download_ntlk()
 invalid_words = stopwords.words('english')
 
 
