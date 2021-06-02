@@ -45,6 +45,6 @@ six==1.15.0
 tldextract==2.2.3
 toml
 tqdm==4.50.0
-urllib3==1.25.10
+urllib3==1.26.5
 Werkzeug==1.0.1
 zipp==3.3.0
