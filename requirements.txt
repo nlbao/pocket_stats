@@ -24,7 +24,7 @@ joblib==0.17.0
 MarkupSafe==1.1.1
 more-itertools
 nltk==3.5
-numpy==1.19.2
+numpy==1.22.0
 packaging==20.4
 pandas==1.1.2
 plotly==4.11.0
