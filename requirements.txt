@@ -20,7 +20,7 @@ importlib-metadata==2.0.0
 iniconfig==1.0.1
 itsdangerous==1.1.0
 Jinja2==2.11.3
-joblib==0.17.0
+joblib==1.2.0
 MarkupSafe==1.1.1
 more-itertools
 nltk==3.5
